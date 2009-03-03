@@ -239,14 +239,14 @@ bool JuliaShader::handleEnableNormalMapping( const CEGUI::EventArgs& e )
 
 void JuliaShader::set_uniform_variables( const float pixel_width )
 {
-    glUniform2f( shader_.variable_location( "seed" ), seed_.x_, seed_.y_ );
-    glUniform1i( shader_.variable_location( "num_iterations" ), num_iterations_ );
-    glUniform1f( shader_.variable_location( "palette_offset" ), palette_offset_ );
-    glUniform1f( shader_.variable_location( "pixel_width" ), pixel_width );
+    shader_.set_uniform_vec2d( "seed", seed_ );
+    shader_.set_uniform_int( "num_iterations", num_iterations_ );
+    shader_.set_uniform_float( "palette_offset", palette_offset_ );
+    shader_.set_uniform_float( "pixel_width", pixel_width );
 
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, palette_.getTexture() );
-    glUniform1i( shader_.variable_location( "palette" ), 0 );
+    shader_.set_uniform_int( "palette", 0 );
 }
 
 void JuliaShader::doOneStep( double step_time )

@@ -18,10 +18,13 @@ struct Shader
     void load_program( cstring& shader_program);
     void load_from_file( cstring& filename );
     void load_from_template( cstring& filename, const google::TemplateDictionary& dictionary );
-    int variable_location( cstring& name );
 
     void enable();
     void disable();
+
+    void set_uniform_vec2d( cstring& name, const Vector2Df& value );
+    void set_uniform_float( cstring& name, const float v );
+    void set_uniform_int( cstring& name, const int v );
 
 protected:
     GLuint

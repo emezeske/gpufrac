@@ -61,7 +61,7 @@ cstring MandelbrotShader::GENERATOR_NAME = "Mandelbrot (OpenGL Shader)";
 MandelbrotShader::MandelbrotShader() :
     palette_( "palette.png" ),
     palette_offset_( 0.0f ),
-    max_iterations_( 8 )
+    num_iterations_( 8 )
 {
     initialize_gui();
 
@@ -85,12 +85,12 @@ void MandelbrotShader::destroy_gui()
 
 void MandelbrotShader::set_uniform_variables()
 {
-    glUniform1i( shader_.variable_location( "num_iterations" ), max_iterations_ );
-    glUniform1f( shader_.variable_location( "palette_offset" ), palette_offset_ );
+    shader_.set_uniform_int( "num_iterations", num_iterations_ );
+    shader_.set_uniform_float( "palette_offset", palette_offset_ );
 
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, palette_.getTexture() );
-    glUniform1i( shader_.variable_location( "palette" ), 0 );
+    shader_.set_uniform_int( "palette", 0 );
 }
 
 void MandelbrotShader::doOneStep( double step_time )

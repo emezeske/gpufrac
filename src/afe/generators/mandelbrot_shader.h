@@ -20,7 +20,7 @@ private:
 
     float palette_offset_;
 
-    int max_iterations_;
+    int num_iterations_;
 
     Shader shader_;
 

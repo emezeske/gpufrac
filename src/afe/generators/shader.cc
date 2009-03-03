@@ -154,11 +154,36 @@ void Shader::ensure_shader_linked()
     }
 }
 
-int Shader::variable_location( cstring& name )
+void Shader::set_uniform_vec2d( cstring& name, const Vector2Df& value )
 {
     int location = glGetUniformLocation( gl_shader_program_, name.c_str() );
-    // TODO
-    //if ( location == -1 ) throw std::runtime_error( "Could not find uniform variable '" + name + "'" );
-    if ( location == -1 ) VNOTIFY( FAULT, "WARNING: Could not find uniform variable '%s'", name );
-    return location;
+    
+    if ( location != -1 )
+    {
+        glUniform2f( location, value.x_, value.y_ );
+    }
+    else VNOTIFY( FAULT, "WARNING: Could not find uniform vec2d '%s'", name );
 }
+
+void Shader::set_uniform_float( cstring& name, const float v )
+{
+    int location = glGetUniformLocation( gl_shader_program_, name.c_str() );
+    
+    if ( location != -1 )
+    {
+        glUniform1f( location, v );
+    }
+    else VNOTIFY( FAULT, "WARNING: Could not find uniform float '%s'", name );
+}
+
+void Shader::set_uniform_int( cstring& name, const int v )
+{
+    int location = glGetUniformLocation( gl_shader_program_, name.c_str() );
+    
+    if ( location != -1 )
+    {
+        glUniform1i( location, v );
+    }
+    else VNOTIFY( FAULT, "WARNING: Could not find uniform int '%s'", name );
+}
+

@@ -27,6 +27,7 @@ int main()
     catch ( CEGUI::Exception &e ) { VNOTIFY( FAULT, "CEGUI Exception: %s.", e.getMessage().c_str() ); }
     catch ( LoadingError &e ) { VNOTIFY( FAULT, "LoadingError: %s.", e.what().c_str() ); }
     catch ( std::exception &e ) { VNOTIFY( FAULT, "std::exception: %s.", e.what() ); }
+    catch ( const char *e ) { VNOTIFY( FAULT, "error: %s.", e ); }
 
     return result;
 }
