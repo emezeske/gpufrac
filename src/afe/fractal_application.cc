@@ -166,6 +166,9 @@ bool FractalApplication::handleGenerator( const CEGUI::EventArgs& e )
 
     VNOTIFY( FAULT, "generator selected: %s", item->getText().c_str() );
 
+    // Ensure the destructor for the old FractalGenerator is called before creating the new one.
+    // TODO: It would be nice to enforce this behavior somehow...
+    generator_.reset();
     generator_ = get_generator( item->getText().c_str() );
 
     return true;
