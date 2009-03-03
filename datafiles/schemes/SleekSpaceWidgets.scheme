@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="SleekSpaceWidgets">
+	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
+	<FalagardMapping WindowType="SleekSpace/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="SleekSpace/Button" />
+	<FalagardMapping WindowType="SleekSpace/Checkbox"    TargetType="CEGUI/Checkbox"    Renderer="Falagard/ToggleButton" LookNFeel="SleekSpace/Checkbox" />
+	<FalagardMapping WindowType="SleekSpace/ImageButton" TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="SleekSpace/ImageButton" />
+	<FalagardMapping WindowType="SleekSpace/RadioButton" TargetType="CEGUI/RadioButton" Renderer="Falagard/ToggleButton" LookNFeel="SleekSpace/RadioButton" />
+	<FalagardMapping WindowType="SleekSpace/FrameWindow"  TargetType="CEGUI/FrameWindow" Renderer="Falagard/FrameWindow"  LookNFeel="SleekSpace/FrameWindow" />
+	<FalagardMapping WindowType="SleekSpace/Titlebar"     TargetType="CEGUI/Titlebar"    Renderer="Falagard/Titlebar"     LookNFeel="SleekSpace/Titlebar" />
+	<FalagardMapping WindowType="SleekSpace/SystemButton" TargetType="CEGUI/PushButton"  Renderer="Falagard/SystemButton" LookNFeel="SleekSpace/Button" />
+	<FalagardMapping WindowType="SleekSpace/Editbox"          TargetType="CEGUI/Editbox"          Renderer="Falagard/Editbox"          LookNFeel="SleekSpace/Editbox" />
+	<FalagardMapping WindowType="SleekSpace/MultiLineEditbox" TargetType="CEGUI/MultiLineEditbox" Renderer="Falagard/MultiLineEditbox" LookNFeel="SleekSpace/MultiLineEditbox" />
+	<FalagardMapping WindowType="SleekSpace/Menubar"   TargetType="CEGUI/Menubar"   Renderer="Falagard/Menubar"   LookNFeel="SleekSpace/Menubar" />
+	<FalagardMapping WindowType="SleekSpace/PopupMenu" TargetType="CEGUI/PopupMenu" Renderer="Falagard/PopupMenu" LookNFeel="SleekSpace/PopupMenu" />
+	<FalagardMapping WindowType="SleekSpace/MenuItem"  TargetType="CEGUI/MenuItem"  Renderer="Falagard/MenuItem"  LookNFeel="SleekSpace/MenuItem" />
+	<FalagardMapping WindowType="SleekSpace/AlternateProgressBar" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="SleekSpace/AltProgressBar" />
+	<FalagardMapping WindowType="SleekSpace/ProgressBar"          TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="SleekSpace/ProgressBar" />
+	<FalagardMapping WindowType="SleekSpace/VUMeter"              TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="SleekSpace/VUMeter" />
+	<FalagardMapping WindowType="SleekSpace/VerticalScrollbar"   TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="SleekSpace/VerticalScrollbar" />
+	<FalagardMapping WindowType="SleekSpace/HorizontalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="SleekSpace/HorizontalScrollbar" />
+	<FalagardMapping WindowType="SleekSpace/VerticalScrollbarThumb"   TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="SleekSpace/VerticalScrollbarThumb" />
+	<FalagardMapping WindowType="SleekSpace/HorizontalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="SleekSpace/HorizontalScrollbarThumb" />
+	<FalagardMapping WindowType="SleekSpace/LargeVerticalScrollbar"      TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="SleekSpace/LargeVerticalScrollbar" />
+	<FalagardMapping WindowType="SleekSpace/LargeVerticalScrollbarThumb" TargetType="CEGUI/Thumb"     Renderer="Falagard/Button"    LookNFeel="SleekSpace/LargeVerticalScrollbarThumb" />
+	<FalagardMapping WindowType="SleekSpace/TabButton"  TargetType="CEGUI/TabButton"  Renderer="Falagard/TabButton"  LookNFeel="SleekSpace/TabButton" />
+	<FalagardMapping WindowType="SleekSpace/TabControl" TargetType="CEGUI/TabControl" Renderer="Falagard/TabControl" LookNFeel="SleekSpace/TabControl" />
+	<FalagardMapping WindowType="SleekSpace/TabContentPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="SleekSpace/TabContentPane" />
+	<FalagardMapping WindowType="SleekSpace/ComboDropList" TargetType="CEGUI/ComboDropList" Renderer="Falagard/Listbox" LookNFeel="SleekSpace/ComboDropList" />
+	<FalagardMapping WindowType="SleekSpace/ComboEditbox"  TargetType="CEGUI/Editbox"	 Renderer="Falagard/Editbox" LookNFeel="SleekSpace/ComboEditbox" />
+	<FalagardMapping WindowType="SleekSpace/Combobox"	TargetType="CEGUI/Combobox"	 Renderer="Falagard/Default" LookNFeel="SleekSpace/Combobox" />
+	<FalagardMapping WindowType="SleekSpace/Listbox"           TargetType="CEGUI/Listbox"           Renderer="Falagard/Listbox"           LookNFeel="SleekSpace/Listbox" />
+	<FalagardMapping WindowType="SleekSpace/ListHeader"        TargetType="CEGUI/ListHeader"        Renderer="Falagard/ListHeader"        LookNFeel="SleekSpace/ListHeader" />
+	<FalagardMapping WindowType="SleekSpace/ListHeaderSegment" TargetType="CEGUI/ListHeaderSegment" Renderer="Falagard/ListHeaderSegment" LookNFeel="SleekSpace/ListHeaderSegment" />
+	<FalagardMapping WindowType="SleekSpace/MultiColumnList"   TargetType="CEGUI/MultiColumnList"   Renderer="Falagard/MultiColumnList"   LookNFeel="SleekSpace/MultiColumnList" />
+	<FalagardMapping WindowType="SleekSpace/Slider"      TargetType="CEGUI/Slider" Renderer="Falagard/Slider"  LookNFeel="SleekSpace/Slider" />
+	<FalagardMapping WindowType="SleekSpace/SliderThumb" TargetType="CEGUI/Thumb"  Renderer="Falagard/Button"  LookNFeel="SleekSpace/SliderThumb" />
+	<FalagardMapping WindowType="SleekSpace/ScrollablePane" TargetType="CEGUI/ScrollablePane" Renderer="Falagard/ScrollablePane" LookNFeel="SleekSpace/ScrollablePane" />
+	<FalagardMapping WindowType="SleekSpace/Spinner" TargetType="CEGUI/Spinner" Renderer="Falagard/Default" LookNFeel="SleekSpace/Spinner" />
+	<FalagardMapping WindowType="SleekSpace/Tooltip" TargetType="CEGUI/Tooltip" Renderer="Falagard/Tooltip" LookNFeel="SleekSpace/Tooltip" />
+	<FalagardMapping WindowType="SleekSpace/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="SleekSpace/StaticImage" />
+	<FalagardMapping WindowType="SleekSpace/StaticText"  TargetType="DefaultWindow" Renderer="Falagard/StaticText"  LookNFeel="SleekSpace/StaticText" />
+	<FalagardMapping WindowType="SleekSpace/ItemListbox" TargetType="CEGUI/ItemListbox" Renderer="Falagard/ItemListbox" LookNFeel="SleekSpace/ItemListbox" />
+	<FalagardMapping WindowType="SleekSpace/ListboxItem" TargetType="CEGUI/ItemEntry"   Renderer="Falagard/ItemEntry"   LookNFeel="SleekSpace/ListboxItem" />
+    	<FalagardMapping WindowType="SleekSpace/GroupBox" TargetType="CEGUI/GroupBox"   Renderer="Falagard/Default"   LookNFeel="SleekSpace/GroupBox" />
+</GUIScheme>

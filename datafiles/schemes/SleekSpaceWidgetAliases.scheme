@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="SleekSpaceWidgetAliases">
+	<WindowAlias Alias="SleekSpace AltProgressBar" Target="SleekSpace/AlternateProgressBar" />
+	<WindowAlias Alias="SleekSpace Button" Target="SleekSpace/Button" />
+	<WindowAlias Alias="SleekSpace Checkbox" Target="SleekSpace/Checkbox" />
+	<WindowAlias Alias="SleekSpace System Button" Target="SleekSpace/SystemButton" />
+	<WindowAlias Alias="SleekSpace Combobox" Target="SleekSpace/Combobox" />
+	<WindowAlias Alias="SleekSpace ComboDropList" Target="SleekSpace/ComboDropList" />
+	<WindowAlias Alias="SleekSpace ComboEditbox" Target="SleekSpace/ComboEditbox" />
+	<WindowAlias Alias="SleekSpace Editbox" Target="SleekSpace/Editbox" />
+	<WindowAlias Alias="SleekSpace Frame Window" Target="SleekSpace/FrameWindow" />
+	<WindowAlias Alias="SleekSpace Listbox" Target="SleekSpace/Listbox" />
+	<WindowAlias Alias="SleekSpace ListHeader" Target="SleekSpace/ListHeader" />
+	<WindowAlias Alias="SleekSpace ListHeaderSegment" Target="SleekSpace/ListHeaderSegment" />
+	<WindowAlias Alias="SleekSpace MiniHorzScrollbar" Target="SleekSpace/HorizontalScrollbar" />
+	<WindowAlias Alias="SleekSpace MiniHorzScrollbarThumb" Target="SleekSpace/HorizontalScrollbarThumb" />
+	<WindowAlias Alias="SleekSpace MiniVertScrollbar" Target="SleekSpace/VerticalScrollbar" />
+	<WindowAlias Alias="SleekSpace MiniVertScrollbarThumb" Target="SleekSpace/VerticalScrollbarThumb" />
+	<WindowAlias Alias="SleekSpace MultiColumnList" Target="SleekSpace/MultiColumnList" />
+	<WindowAlias Alias="SleekSpace MultiLineEditbox" Target="SleekSpace/MultiLineEditbox" />
+	<WindowAlias Alias="SleekSpace ProgressBar" Target="SleekSpace/ProgressBar" />
+	<WindowAlias Alias="SleekSpace RadioButton" Target="SleekSpace/RadioButton" />
+	<WindowAlias Alias="SleekSpace Slider" Target="SleekSpace/Slider" />
+	<WindowAlias Alias="SleekSpace Slider Thumb" Target="SleekSpace/SliderThumb" />
+	<WindowAlias Alias="SleekSpace StaticImage" Target="SleekSpace/StaticImage" />
+	<WindowAlias Alias="SleekSpace StaticText" Target="SleekSpace/StaticText" />
+	<WindowAlias Alias="SleekSpace Tab Button" Target="SleekSpace/TabButton" />
+	<WindowAlias Alias="SleekSpace Tab Control" Target="SleekSpace/TabControl" />
+	<WindowAlias Alias="SleekSpace Titlebar" Target="SleekSpace/Titlebar" />
+	<WindowAlias Alias="SleekSpace VertScrollbar" Target="SleekSpace/LargeVerticalScrollbar" />
+	<WindowAlias Alias="SleekSpace VertScrollbarThumb" Target="SleekSpace/LargeVerticalScrollbarThumb" />
+	<WindowAlias Alias="SleekSpace GroupBox" Target="SleekSpace/GroupBox" />
+</GUIScheme>
