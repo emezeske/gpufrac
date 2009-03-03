@@ -16,7 +16,7 @@ float calculate_escape_magnitude( vec2 z )
             radius_squared = z_x_squared + z_y_squared;
 
         {{#COLORING_METHOD_Continuous}}
-            escape_magnitude += pow( 2.71828182845904523536, -sqrt( radius_squared ) );
+            escape_magnitude += pow( 2.71828182845904523536, -sqrt( radius_squared ) ); // e ^( -radius )
         {{/COLORING_METHOD_Continuous}}
 
         {{#COLORING_METHOD_Iterative}}

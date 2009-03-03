@@ -53,13 +53,13 @@ void FractalWindow::createWindow()
 
 void FractalWindow::reshapeWindow() // Override the default reshapeWindow(), to use an orthogonal projection matrix.
 {
-  	glMatrixMode( GL_PROJECTION );
-  	glLoadIdentity();
-
-	glOrtho( 0, screen_width_, 0, screen_height_, 0, 1.0 );
-
-  	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    
+    glOrtho( 0, screen_width_, 0, screen_height_, 0, 1.0 );
+    
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
 
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );

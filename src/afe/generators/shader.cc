@@ -157,6 +157,8 @@ void Shader::ensure_shader_linked()
 int Shader::variable_location( cstring& name )
 {
     int location = glGetUniformLocation( gl_shader_program_, name.c_str() );
-    if ( location == -1 ) throw std::runtime_error( "Could not find uniform variable '" + name + "'" );
+    // TODO
+    //if ( location == -1 ) throw std::runtime_error( "Could not find uniform variable '" + name + "'" );
+    if ( location == -1 ) VNOTIFY( FAULT, "WARNING: Could not find uniform variable '%s'", name );
     return location;
 }
