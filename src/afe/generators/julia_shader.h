@@ -10,8 +10,8 @@
 
 enum coloring_method
 {
-    CM_ITERATIONS,
-    CM_RADIUS_SQUARED
+    CM_ITERATIVE,
+    CM_CONTINUOUS
 };
 
 enum escape_condition
@@ -40,11 +40,17 @@ private:
         MIN_ITERATIONS = 1,
         MAX_ITERATIONS = 512;
 
+    static const float
+        MAX_PALETTE_CYCLE_SPEED = 1.0f,
+        PALETTE_CYCLE_SPEED_DEADZONE = 0.1f;
+
     Shader shader_;
 
     TextureMap palette_;
 
-    float palette_offset_;
+    float 
+        palette_offset_,
+        palette_cycle_speed_;
 
     int num_iterations_;
 
@@ -52,7 +58,8 @@ private:
 
     bool
         mouse_moving_seed_,
-        cycle_palette_;
+        enable_multisampling_,
+        enable_normal_mapping_;
 
     coloring_method coloring_method_;
     escape_condition escape_condition_;
@@ -61,10 +68,12 @@ private:
     void destroy_gui();
 
     bool handleIterationsSlider( const CEGUI::EventArgs& e );
+    bool handlePaletteCycleSpeedSlider( const CEGUI::EventArgs& e );
     bool handleColoringMethod( const CEGUI::EventArgs& e );
     bool handleEscapeCondition( const CEGUI::EventArgs& e );
     bool handleSeedReal( const CEGUI::EventArgs& e );
-    bool handleCyclePalette( const CEGUI::EventArgs& e );
+    bool handleEnableMultisampling( const CEGUI::EventArgs& e );
+    bool handleEnableNormalMapping( const CEGUI::EventArgs& e );
     
     void load_shader_program();
     void set_uniform_variables( const float pixel_width );

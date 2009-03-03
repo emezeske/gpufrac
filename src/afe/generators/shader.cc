@@ -83,6 +83,14 @@ void Shader::load_from_file( cstring& filename )
     else throw LoadingError( "Unable to open shader program file " + filename );
 }
 
+void Shader::load_from_template( cstring& filename, const google::TemplateDictionary& dictionary )
+{
+    google::Template* glsl_template = google::Template::GetTemplate( filename.c_str(), google::DO_NOT_STRIP );
+    mstring expanded_glsl;
+    glsl_template->Expand( &expanded_glsl, &dictionary );
+    load_program( expanded_glsl );
+}
+
 void Shader::print_with_line_numbers( cstring& shader_program )
 {
     typedef std::vector<mstring> stringv;

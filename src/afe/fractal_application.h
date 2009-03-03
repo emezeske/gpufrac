@@ -38,11 +38,12 @@ class FractalApplication : public SDL_GL_Interface
         virtual ~FractalApplication();
 
     protected:
-		virtual void handleKeyDownEvent( SDL_Event& e );
-		virtual void handleKeyUpEvent( SDL_Event& e );
-		virtual void handleMouseMotionEvent( SDL_Event& e );
-		virtual void handleMouseDownEvent( SDL_Event& e );
-		virtual void handleMouseUpEvent( SDL_Event& e );
+		virtual void handleEvent( SDL_Event& event );
+        virtual void handleKeyDownEvent( SDL_Event& e );
+        virtual void handleKeyUpEvent( SDL_Event& e );
+        virtual void handleMouseMotionEvent( SDL_Event& e );
+        virtual void handleMouseDownEvent( SDL_Event& e );
+        virtual void handleMouseUpEvent( SDL_Event& e );
         virtual void doOneStep( const double stepTime );
         virtual void draw();
 
@@ -61,6 +62,8 @@ class FractalApplication : public SDL_GL_Interface
         Viewport viewport_;
 
         pFractalGenerator generator_;
+
+        boost::shared_ptr<CEGUI::OpenGLRenderer> cegui_renderer_;
 
         long frames_;
 };

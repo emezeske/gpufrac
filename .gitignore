@@ -1,0 +1,6 @@
+CEGUI.log
+tags
+.sconsign.dblite
+advanced-fractal-explorer
+/*/*/*.o
+/*/*/*/*.o

@@ -36,7 +36,7 @@ struct Vector2D
 
     T length() const
     {
-        return sqrt( length_squared() ); // TODO Provide specialization for sqrtf();
+        return sqrtf( length_squared() ); // TODO Provide specialization for sqrt()?;
     }
 
     T slope() const

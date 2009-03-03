@@ -7,62 +7,83 @@
         <Property Name="RollUpEnabled" Value="False" />
         <Property Name="UnifiedMaxSize" Value="{{0.8,0},{0.8,0}}" />
         <Property Name="TitlebarEnabled" Value="True" />
-        <Property Name="UnifiedAreaRect" Value="{{0.47474,0},{0.0281955,0},{0.977445,0},{0.9385,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0.514081,0},{0.0110806,0},{0.992083,0},{0.437279,0}}" />
         <Property Name="CloseButtonEnabled" Value="False" />
+        <Window Type="SleekSpace/StaticText" Name="afe/julia_shader/misc_text_3" >
+            <Property Name="Text" Value=" Palette Cycle Speed" />
+            <Property Name="HorzFormatting" Value="HorzCentred" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.000473386,0},{0.573288,0},{0.919225,0},{0.648911,0}}" />
+            <Property Name="HorizontalAlignment" Value="Centre" />
+        </Window>
+        <Window Type="SleekSpace/Slider" Name="afe/julia_shader/palette_cycle_speed/slider" >
+            <Property Name="Text" Value="Palette Cycle Speed" />
+            <Property Name="CurrentValue" Value="0" />
+            <Property Name="MaximumValue" Value="1" />
+            <Property Name="ClickStepSize" Value="0.01" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.0393792,0},{0.651392,0},{0.958129,0},{0.761435,0}}" />
+        </Window>
         <Window Type="SleekSpace/Slider" Name="afe/julia_shader/iterations/slider" >
             <Property Name="Text" Value="Iterations" />
             <Property Name="CurrentValue" Value="0" />
             <Property Name="MaximumValue" Value="1" />
             <Property Name="ClickStepSize" Value="0.01" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.0373461,0},{0.852187,0},{0.956096,0},{0.949522,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.0375247,0},{0.845465,0},{0.956275,0},{0.955507,0}}" />
         </Window>
         <Window Type="SleekSpace/Combobox" Name="afe/julia_shader/coloring_method" >
             <Property Name="Text" Value="Select Coloring Method" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.036701,0},{0.081708,0},{0.536701,0},{0.761623,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.0290151,0},{0.12187,0},{0.499858,0},{0.573147,0}}" />
             <Property Name="MaxEditTextLength" Value="1073741823" />
         </Window>
         <Window Type="SleekSpace/Editbox" Name="afe/julia_shader/seed_real" >
             <Property Name="MaxTextLength" Value="1073741823" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.344761,0},{0.284536,0},{0.548721,0},{0.369241,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.772251,0},{0.113962,0},{0.964528,0},{0.209918,0}}" />
         </Window>
         <Window Type="SleekSpace/Editbox" Name="afe/julia_shader/seed_imaginary" >
             <Property Name="MaxTextLength" Value="1073741823" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.344762,0},{0.40487,0},{0.548721,0},{0.489575,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.770308,0},{0.222218,0},{0.962584,0},{0.318174,0}}" />
         </Window>
         <Window Type="SleekSpace/StaticText" Name="afe/julia_shader/seed_real_label" >
             <Property Name="Text" Value=" Seed (Real)" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.098396,0},{0.284536,0},{0.30529,0},{0.369241,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.543417,0},{0.113962,0},{0.756156,0},{0.209918,0}}" />
         </Window>
         <Window Type="SleekSpace/StaticText" Name="afe/julia_shader/seed_imaginary_label" >
             <Property Name="Text" Value=" Seed (Imag)" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.098396,0},{0.40487,0},{0.30529,0},{0.489575,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.543417,0},{0.222218,0},{0.756156,0},{0.318174,0}}" />
         </Window>
         <Window Type="SleekSpace/StaticText" Name="afe/julia_shader/misc_text_0" >
-            <Property Name="Text" Value=" Left Shift + Mouse To Change" />
+            <Property Name="Text" Value=" LShift + Mouse To Change" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.0953638,0},{0.515504,0},{0.561259,0},{0.579588,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.539589,0},{0.34365,0},{0.976275,0},{0.444618,0}}" />
         </Window>
         <Window Type="SleekSpace/StaticText" Name="afe/julia_shader/misc_text_1" >
             <Property Name="Text" Value=" Max Iterations" />
+            <Property Name="HorzFormatting" Value="HorzCentred" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.354088,0},{0.807365,0},{0.598078,0},{0.862571,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.0374343,0},{0.770178,0},{0.956186,0},{0.8458,0}}" />
         </Window>
         <Window Type="SleekSpace/Combobox" Name="afe/julia_shader/escape_condition" >
             <Property Name="Text" Value="Select Escape Condition..." />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.036701,0},{0.162174,0},{0.536701,0},{0.837996,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.0290151,0},{0.278028,0},{0.499858,0},{0.699552,0}}" />
             <Property Name="MaxEditTextLength" Value="1073741823" />
         </Window>
-        <Window Type="SleekSpace/Checkbox" Name="afe/julia_shader/cycle_palette" >
-            <Property Name="Text" Value="Cycle Palette" />
+        <Window Type="SleekSpace/Checkbox" Name="afe/julia_shader/enable_multisampling" >
+            <Property Name="Text" Value="Multisampling" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-            <Property Name="UnifiedAreaRect" Value="{{0.623201,0},{0.0696475,0},{0.873201,0},{0.13618,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.113055,0},{0.377777,0},{0.374539,0},{0.458541,0}}" />
+        </Window>
+        <Window Type="SleekSpace/Checkbox" Name="afe/julia_shader/enable_normal_mapping" >
+            <Property Name="Text" Value="Normal Mapping" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.113055,0},{0.458092,0},{0.408994,0},{0.541725,0}}" />
         </Window>
     </Window>
 </GUILayout>

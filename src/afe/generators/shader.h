@@ -3,6 +3,7 @@
 
 #include <SDL/SDL_opengl.h>
 #include <string>
+#include <google/template.h>  
 
 #include "common/utilities.h"
 #include "common/drawing_utilities.h"
@@ -16,6 +17,7 @@ struct Shader
 
     void load_program( cstring& shader_program);
     void load_from_file( cstring& filename );
+    void load_from_template( cstring& filename, const google::TemplateDictionary& dictionary );
     int variable_location( cstring& name );
 
     void enable();

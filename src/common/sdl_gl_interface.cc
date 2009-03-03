@@ -131,27 +131,22 @@ void SDL_GL_Interface::handleEvent( SDL_Event &event )
     switch ( event.type )
     {
         case SDL_KEYDOWN:
-            //handleKeyDownEvent( event.key.keysym.sym, event.key.keysym.mod );
             handleKeyDownEvent( event );
             break;
 
         case SDL_KEYUP:
-            //handleKeyUpEvent( event.key.keysym.sym, event.key.keysym.mod );
             handleKeyUpEvent( event );
             break;
 
         case SDL_MOUSEMOTION:
-            //handleMouseMotionEvent( event.button.button, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel );
             handleMouseMotionEvent( event );
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            //handleMouseDownEvent( event.button.button, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel );
             handleMouseDownEvent( event );
             break;
 
         case SDL_MOUSEBUTTONUP:
-            //handleMouseUpEvent( event.button.button, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel );
             handleMouseUpEvent( event );
             break;
     

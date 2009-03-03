@@ -7,3 +7,5 @@ libsdl-image1.2-dev
 libglew1.5-dev
 scons
 exuberant-ctags
+
+google-ctemplate # From http://code.google.com/p/google-ctemplate/

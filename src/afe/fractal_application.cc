@@ -63,11 +63,6 @@ void FractalWindow::reshapeWindow() // Override the default reshapeWindow(), to 
 
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-    // TODO Eventually use depth testing to avoid drawing fractals behind menu items.
-
-    // TODO
-    //renderer->setDisplaySize(CEGUI::Size(e.resize.w, e.resize.h));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,10 +85,8 @@ void FractalApplication::initialize_gui()
 {
     using namespace CEGUI;
 
-    // FIXME: This leaks memory.  For some reason, I get a segfault if cegui_ is a member of FractalApplication...
-    OpenGLRenderer* cegui_;
-    cegui_ = new OpenGLRenderer( 0, window_.width(), window_.height() );
-    new System( cegui_ );
+    cegui_renderer_.reset( new OpenGLRenderer( 0, window_.width(), window_.height() ) );
+    new System( cegui_renderer_.get() );
 
     // initialize the required dirs for the DefaultResourceProvider
     DefaultResourceProvider* rp = static_cast<DefaultResourceProvider*>( System::getSingleton().getResourceProvider() );
@@ -123,7 +116,7 @@ void FractalApplication::initialize_gui()
 
     wm.getWindow( "afe/general/exit" )->subscribeEvent( PushButton::EventClicked, Event::Subscriber( &FractalApplication::handleExit, this ) );
 
-    configure_slider( "afe/general/opacity/slider", 1.0f, Event::Subscriber( &FractalApplication::handleOpacitySlider, this ) );
+    configure_slider( "afe/general/opacity/slider", 0.85f, Event::Subscriber( &FractalApplication::handleOpacitySlider, this ) );
 
     configure_dropdown_box( "afe/general/generator", generators, Event::Subscriber( &FractalApplication::handleGenerator, this ) );
 
@@ -176,6 +169,16 @@ bool FractalApplication::handleGenerator( const CEGUI::EventArgs& e )
     generator_ = get_generator( item->getText().c_str() );
 
     return true;
+}
+
+void FractalApplication::handleEvent( SDL_Event &e )
+{
+    SDL_GL_Interface::handleEvent( e );
+
+    if ( e.type == SDL_VIDEORESIZE )
+    {
+        cegui_renderer_->setDisplaySize( CEGUI::Size( static_cast<float>( e.resize.w ), static_cast<float>( e.resize.h ) ) );
+    }
 }
 
 void FractalApplication::handleKeyDownEvent( SDL_Event& e )
