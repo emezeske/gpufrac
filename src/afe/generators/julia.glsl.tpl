@@ -8,8 +8,9 @@ uniform float color_exponent;
 float calculate_escape_magnitude( vec2 z )
 {
     float escape_magnitude = 0.0;
+    int i;
 
-    for ( int i = 0; i < num_iterations; ++i )
+    for ( i = 0; i < num_iterations; ++i )
     {
         float
             z_x_squared = z.x * z.x,
@@ -20,9 +21,6 @@ float calculate_escape_magnitude( vec2 z )
             escape_magnitude += exp( -sqrt( radius_squared ) ); // e ^( -radius )
         {{/COLORING_METHOD_Continuous}}
 
-        {{#COLORING_METHOD_Iterative}}
-	    escape_magnitude =  pow( 1 - ( float( i) / float( num_iterations ) ), color_exponent);
-        {{/COLORING_METHOD_Iterative}}
 
         {{#ESCAPE_CONDITION_Circle}}
 	    if ( radius_squared > 4.0 ) break;		
@@ -34,6 +32,10 @@ float calculate_escape_magnitude( vec2 z )
 
         z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + seed;
     }
+
+    {{#COLORING_METHOD_Iterative}}
+        escape_magnitude =  2 * pow( 1 - ( float( i) / float( num_iterations ) ), color_exponent);
+    {{/COLORING_METHOD_Iterative}}
 
     return escape_magnitude;
 }
