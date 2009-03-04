@@ -162,7 +162,7 @@ void Shader::set_uniform_vec2d( cstring& name, const Vector2Df& value )
     {
         glUniform2f( location, value.x_, value.y_ );
     }
-    else VNOTIFY( FAULT, "WARNING: Could not find uniform vec2d '%s'", name );
+    else VNOTIFY( FAULT, "WARNING: Could not find uniform vec2d '%s'", name.c_str() );
 }
 
 void Shader::set_uniform_float( cstring& name, const float v )
@@ -173,7 +173,7 @@ void Shader::set_uniform_float( cstring& name, const float v )
     {
         glUniform1f( location, v );
     }
-    else VNOTIFY( FAULT, "WARNING: Could not find uniform float '%s'", name );
+    else VNOTIFY( FAULT, "WARNING: Could not find uniform float '%s'", name.c_str() );
 }
 
 void Shader::set_uniform_int( cstring& name, const int v )
@@ -184,6 +184,6 @@ void Shader::set_uniform_int( cstring& name, const int v )
     {
         glUniform1i( location, v );
     }
-    else VNOTIFY( FAULT, "WARNING: Could not find uniform int '%s'", name );
+    else VNOTIFY( FAULT, "WARNING: Could not find uniform int '%s'", name.c_str() );
 }
 
