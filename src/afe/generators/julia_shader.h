@@ -42,18 +42,21 @@ private:
 
     static const float
         MAX_PALETTE_CYCLE_SPEED = 1.0f,
-        PALETTE_CYCLE_SPEED_DEADZONE = 0.1f;
+        PALETTE_CYCLE_SPEED_DEADZONE = 0.1f,
+        MIN_COLOR_EXPONENT = 0.1f,
+        MAX_COLOR_EXPONENT = 10.0f;
 
     Shader shader_;
 
     TextureMap palette_;
 
     float 
-        palette_offset_,
-        palette_cycle_speed_;
+      palette_offset_,
+      palette_cycle_speed_,
+      color_exponent_;
 
     int num_iterations_;
-
+    
     Vector2Df seed_;
 
     bool
@@ -68,6 +71,7 @@ private:
     void destroy_gui();
 
     bool handleIterationsSlider( const CEGUI::EventArgs& e );
+    bool handleColorSlider( const CEGUI::EventArgs& e);
     bool handlePaletteCycleSpeedSlider( const CEGUI::EventArgs& e );
     bool handleColoringMethod( const CEGUI::EventArgs& e );
     bool handleEscapeCondition( const CEGUI::EventArgs& e );

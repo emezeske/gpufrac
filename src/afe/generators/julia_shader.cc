@@ -28,6 +28,7 @@ JuliaShader::JuliaShader() :
     palette_( "palette.png" ),
     palette_offset_( 0.0f ),
     palette_cycle_speed_( 0.0f ),
+    color_exponent_( 1.0 ),
     num_iterations_( 8 ),
     seed_( 0.0f, 0.0f ),
     mouse_moving_seed_( false ),
@@ -104,9 +105,11 @@ void JuliaShader::initialize_gui()
     root->addChildWindow( julia_shader );
     julia_shader->moveToFront();
 
-    configure_slider( "afe/julia_shader/iterations/slider", 8.0f / static_cast<float>( MAX_ITERATIONS ), Event::Subscriber( &JuliaShader::handleIterationsSlider, this ) );
+    configure_slider( "afe/julia_shader/iterations/slider", 64.0f / static_cast<float>( MAX_ITERATIONS ), Event::Subscriber( &JuliaShader::handleIterationsSlider, this ) );
 
     configure_slider( "afe/julia_shader/palette_cycle_speed/slider", 0.5f, Event::Subscriber( &JuliaShader::handlePaletteCycleSpeedSlider, this ) );
+
+    configure_slider( "afe/julia_shader/color_exponent/slider", 1.0f, Event::Subscriber( &JuliaShader::handleColorSlider, this) );
 
     configure_dropdown_box( "afe/julia_shader/coloring_method", coloring_methods, Event::Subscriber( &JuliaShader::handleColoringMethod, this ) );
 
@@ -146,6 +149,20 @@ bool JuliaShader::handleIterationsSlider( const CEGUI::EventArgs& e )
 
     if ( num_iterations_ < MIN_ITERATIONS ) num_iterations_ = MIN_ITERATIONS;
     else if ( num_iterations_ > MAX_ITERATIONS ) num_iterations_ = MAX_ITERATIONS;
+
+    return true;
+}
+
+bool JuliaShader::handleColorSlider( const CEGUI::EventArgs& e )
+{
+  using namespace CEGUI;
+
+    float position = static_cast<Slider*>( static_cast<const WindowEventArgs&>(e).window )->getCurrentValue();
+ 
+    color_exponent_ = position;
+    
+    if ( color_exponent_ < MIN_COLOR_EXPONENT ) color_exponent_ = MIN_COLOR_EXPONENT;
+    else if ( color_exponent_ > MAX_COLOR_EXPONENT ) color_exponent_ = MAX_COLOR_EXPONENT;
 
     return true;
 }
@@ -243,6 +260,7 @@ void JuliaShader::set_uniform_variables( const float pixel_width )
     shader_.set_uniform_int( "num_iterations", num_iterations_ );
     shader_.set_uniform_float( "palette_offset", palette_offset_ );
     shader_.set_uniform_float( "pixel_width", pixel_width );
+    shader_.set_uniform_float( "color_exponent", color_exponent_);
 
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, palette_.getTexture() );

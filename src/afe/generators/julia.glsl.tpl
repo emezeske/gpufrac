@@ -3,6 +3,7 @@ uniform sampler2D palette;
 uniform int num_iterations;
 uniform float palette_offset;
 uniform float pixel_width;
+uniform float color_exponent;
 
 float calculate_escape_magnitude( vec2 z )
 {
@@ -16,15 +17,15 @@ float calculate_escape_magnitude( vec2 z )
             radius_squared = z_x_squared + z_y_squared;
 
         {{#COLORING_METHOD_Continuous}}
-            escape_magnitude += pow( 2.71828182845904523536, -sqrt( radius_squared ) ); // e ^( -radius )
+            escape_magnitude += exp( -sqrt( radius_squared ) ); // e ^( -radius )
         {{/COLORING_METHOD_Continuous}}
 
         {{#COLORING_METHOD_Iterative}}
-            escape_magnitude = float( i ) / float( num_iterations );
+	    escape_magnitude =  pow( 1 - ( float( i) / float( num_iterations ) ), color_exponent);
         {{/COLORING_METHOD_Iterative}}
 
         {{#ESCAPE_CONDITION_Circle}}
-            if ( radius_squared > 4.0 ) break;
+	    if ( radius_squared > 4.0 ) break;		
         {{/ESCAPE_CONDITION_Circle}}
 
         {{#ESCAPE_CONDITION_Box}}
