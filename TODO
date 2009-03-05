@@ -7,3 +7,12 @@ Label the opacity slider.
 Make the resolution adjustable during runtime.
 
 Draw the fractal with a 1:1 ratio even when the resolution is not 1:1.
+
+There is a discontinuity for at (x,0) for x<0 when the exponent is a
+non integer. I'm not sure why this is. Maybe due to the math. I need to
+figure out if it's supposed to be there or not.
+
+Using polar coords is naturally more computationally expoensive. The
+checkbox in the julia control panel enabling the polar computatons is
+not hooked up yet. The program needs to be modified to make this
+selection matter.
