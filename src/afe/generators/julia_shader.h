@@ -41,10 +41,12 @@ private:
         MAX_ITERATIONS = 512;
 
     static const float
-        MAX_PALETTE_CYCLE_SPEED = 1.0f,
-        PALETTE_CYCLE_SPEED_DEADZONE = 0.1f,
-        MIN_COLOR_EXPONENT = 0.1f,
-        MAX_COLOR_EXPONENT = 10.0f;
+      MAX_PALETTE_CYCLE_SPEED = 1.0f,
+      PALETTE_CYCLE_SPEED_DEADZONE = 0.1f,
+      MIN_COLOR_EXPONENT = 0.1f,
+      MAX_COLOR_EXPONENT = 10.0f,
+      MIN_JULIA_EXPONENT = -10.0f,
+      MAX_JULIA_EXPONENT = 10.0f;
 
     Shader shader_;
 
@@ -53,7 +55,8 @@ private:
     float 
       palette_offset_,
       palette_cycle_speed_,
-      color_exponent_;
+      color_exponent_,
+      julia_exponent_;
 
     int num_iterations_;
     
@@ -72,6 +75,7 @@ private:
 
     bool handleIterationsSlider( const CEGUI::EventArgs& e );
     bool handleColorSlider( const CEGUI::EventArgs& e);
+    bool handleExponentSlider( const CEGUI::EventArgs& e);
     bool handlePaletteCycleSpeedSlider( const CEGUI::EventArgs& e );
     bool handleColoringMethod( const CEGUI::EventArgs& e );
     bool handleEscapeCondition( const CEGUI::EventArgs& e );

@@ -28,7 +28,8 @@ JuliaShader::JuliaShader() :
     palette_( "palette.png" ),
     palette_offset_( 0.0f ),
     palette_cycle_speed_( 0.0f ),
-    color_exponent_( 1.0 ),
+    color_exponent_( 1.0f ),
+    julia_exponent_( 2.0f ),
     num_iterations_( 8 ),
     seed_( 0.0f, 0.0f ),
     mouse_moving_seed_( false ),
@@ -111,6 +112,8 @@ void JuliaShader::initialize_gui()
 
     configure_slider( "afe/julia_shader/color_exponent/slider", 1.0f, Event::Subscriber( &JuliaShader::handleColorSlider, this) );
 
+    configure_slider( "afe/julia_shader/julia_exponent/slider", 0.6f, Event::Subscriber( &JuliaShader::handleExponentSlider, this) );
+
     configure_dropdown_box( "afe/julia_shader/coloring_method", coloring_methods, Event::Subscriber( &JuliaShader::handleColoringMethod, this ) );
 
     configure_dropdown_box( "afe/julia_shader/escape_condition", escape_conditions, Event::Subscriber( &JuliaShader::handleEscapeCondition, this ) );
@@ -128,6 +131,7 @@ void JuliaShader::initialize_gui()
     // TODO Add a slider for palette stretching factor
 
     setSeed( seed_ ); // Set the initial Editbox values.
+    set_window_text( "afe/julia_shader/julia_exponent/value", julia_exponent_, GUI_SEED_PRECISION );    
 }
 
 void JuliaShader::destroy_gui()
@@ -163,6 +167,21 @@ bool JuliaShader::handleColorSlider( const CEGUI::EventArgs& e )
     
     if ( color_exponent_ < MIN_COLOR_EXPONENT ) color_exponent_ = MIN_COLOR_EXPONENT;
     else if ( color_exponent_ > MAX_COLOR_EXPONENT ) color_exponent_ = MAX_COLOR_EXPONENT;
+
+    return true;
+}
+
+bool JuliaShader::handleExponentSlider( const CEGUI::EventArgs& e )
+{
+  using namespace CEGUI;
+
+    float position = static_cast<Slider*>( static_cast<const WindowEventArgs&>(e).window )->getCurrentValue();
+ 
+    julia_exponent_ =  MIN_JULIA_EXPONENT + ( ( MAX_JULIA_EXPONENT - MIN_JULIA_EXPONENT) * position );
+
+    set_window_text( "afe/julia_shader/julia_exponent/value", julia_exponent_, GUI_SEED_PRECISION );    
+    if ( julia_exponent_ < MIN_JULIA_EXPONENT ) color_exponent_ = MIN_JULIA_EXPONENT;
+    else if ( julia_exponent_ > MAX_JULIA_EXPONENT ) color_exponent_ = MAX_JULIA_EXPONENT;
 
     return true;
 }
@@ -261,6 +280,7 @@ void JuliaShader::set_uniform_variables( const float pixel_width )
     shader_.set_uniform_float( "palette_offset", palette_offset_ );
     shader_.set_uniform_float( "pixel_width", pixel_width );
     shader_.set_uniform_float( "color_exponent", color_exponent_);
+    shader_.set_uniform_float( "julia_exponent", julia_exponent_); 
 
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, palette_.getTexture() );

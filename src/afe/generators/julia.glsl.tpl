@@ -4,6 +4,7 @@ uniform int num_iterations;
 uniform float palette_offset;
 uniform float pixel_width;
 uniform float color_exponent;
+uniform float julia_exponent;
 
 float calculate_escape_magnitude( vec2 z )
 {
@@ -12,10 +13,10 @@ float calculate_escape_magnitude( vec2 z )
 
     for ( i = 0; i < num_iterations; ++i )
     {
-        float
-            z_x_squared = z.x * z.x,
-            z_y_squared = z.y * z.y,
-            radius_squared = z_x_squared + z_y_squared;
+      float
+	z_x_squared = z.x * z.x,
+	z_y_squared = z.y * z.y,
+	radius_squared = z_x_squared + z_y_squared;
 
         {{#COLORING_METHOD_Continuous}}
             escape_magnitude += exp( -sqrt( radius_squared ) ); // e ^( -radius )
@@ -30,11 +31,35 @@ float calculate_escape_magnitude( vec2 z )
             if ( z.x > 2.0 && z.y > 2.0 ) break;
         {{/ESCAPE_CONDITION_Box}}
 
-        z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + seed;
+
+	//TODO -- switch make this code conditional on the checkbox in the 
+	//julia control panel
+ 	float 
+	  new_theta = julia_exponent * atan( z.y , z.x ),
+	  new_radius = pow( radius_squared  , julia_exponent / 2.0 );
+
+	z = 
+	  vec2( 
+	       new_radius * cos(new_theta),//real
+	       new_radius * sin(new_theta)//imag
+	      ) 
+
+	  + seed;
+
+// 	new_theta = new_theta * 2.0 / julia_exponent ;
+// 	new_radius = pow( radius_squared , 2.0 / 2.0 );
+
+// 	z += vec2( 
+// 		  new_radius * cos( new_theta ),
+// 		  new_radius * sin( new_theta )
+// 		 );
+
+	//TODO -- this is the fast way for z-squared only -- make it condition
+//	z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + seed;
     }
 
     {{#COLORING_METHOD_Iterative}}
-        escape_magnitude =  2 * pow( 1 - ( float( i) / float( num_iterations ) ), color_exponent);
+        escape_magnitude =  2 * pow( 1 - ( float( i ) / float( num_iterations ) ), color_exponent);
     {{/COLORING_METHOD_Iterative}}
 
     return escape_magnitude;
@@ -44,6 +69,7 @@ vec3 get_color( float escape_magnitude )
 {
     return texture2D( palette, vec2( escape_magnitude + palette_offset, 0.0 ) ).rgb;
     //return vec3( escape_magnitude, escape_magnitude, escape_magnitude );
+
 }
 
 void main ()

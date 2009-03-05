@@ -113,8 +113,9 @@
             <Property Name="HorizontalAlignment" Value="Centre" />
         </Window>
         <Window Type="SleekSpace/Slider" Name="afe/julia_shader/julia_exponent/slider" >
-            <Property Name="CurrentValue" Value="0" />
-            <Property Name="MaximumValue" Value="10" />
+            <Property Name="CurrentValue" Value="0.6" />
+            <Property Name="MaximumValue" Value="1.0" />
+	    <Property Name="MinimumValue" Value="0.0" />
             <Property Name="ClickStepSize" Value="0.01" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="UnifiedAreaRect" Value="{{0.037373,0},{0.766481,0},{0.634949,0},{0.829213,0}}" />
