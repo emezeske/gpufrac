@@ -14,4 +14,6 @@ Optimize the JuliaCpu generator, possibly by hand-assembling the tightest part o
 
 Add support for higher multisampling (4x, 8x, 16x) as well as different multisampling (four rooks, etc).
 
+Would be nice to build the C++ object files in an out-of-course directory.
+
 Oops, the palette mode radio button is out of sync with the generator at app startup...
