@@ -1,6 +1,5 @@
-CEGUI.log
 tags
 .sconsign.dblite
-advanced-fractal-explorer
-/*/*/*.o
-/*/*/*/*.o
+afepy.so
+*/*/*.os
+*/*/*/*.os

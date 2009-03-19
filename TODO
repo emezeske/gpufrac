@@ -6,4 +6,10 @@ Uniform variables need to either be:
 
 Fullscreen mode would be nice.
 
-Mousewheel zooming.
+Mousewheel zooming would be nice.
+
+Flesh out the JuliaCpu generator so that it supports the same settings as JuliaShader.
+
+Optimize the JuliaCpu generator, possibly by hand-assembling the tightest part of the loop, using SSE.
+
+Add support for higher multisampling (4x, 8x, 16x) as well as different multisampling (four rooks, etc).

@@ -12,8 +12,6 @@ Viewport::Viewport( const Vector2Df& _position, const Vector2Df& _size ) :
 {
 }
 
-// TODO Acceleration / velocity should be scaled with respect to the current zoom level.
-
 void Viewport::set_desired_zoom_velocity( const float desired_zoom_velocity )
 {
     desired_zoom_velocity_ = desired_zoom_velocity;
