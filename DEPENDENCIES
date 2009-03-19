@@ -19,6 +19,12 @@ scons
 ctags
 
 ##################################################
+# Extra tools
+##################################################
+
+wxFormBuilder # Needed to modify the GUI layout (src/gui/afe-gui.fbp).
+
+##################################################
 # Typical Debian package names
 ##################################################
 
@@ -29,5 +35,6 @@ python-wxgtk2.8
 python-opengl
 scons
 exuberant-ctags
+wxformbuilder
 
 google-ctemplate # No deb as of yet; download from http://code.google.com/p/google-ctemplate/
