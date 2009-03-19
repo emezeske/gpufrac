@@ -1,23 +1,34 @@
-import os
-
-env = Environment( ENV = { 
-    'PATH' : os.environ['PATH'], # These environment variables are required by colorgcc.
-    'TERM' : os.environ['TERM'],
-    'HOME' : os.environ['HOME']
-} )
+import os, glob
 
 SetOption( 'num_jobs', 4 ) # Set this to the number of processors you have.  TODO: Automate this.
 
-binary = 'advanced-fractal-explorer'
-libraries = [ 'SDL', 'SDL_image', 'GL', 'GLU', 'GLEW', 'm', 'CEGUIBase', 'CEGUIOpenGLRenderer', 'ctemplate' ]
-compiler_warnings = '-Wall -W -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Wconversion -Winline -Wredundant-decls -Wno-unused'
-compiler_flags = '-g ' + compiler_warnings + ' -DNO_SDL_GLEXT'
-include_paths = [ 'src', '/usr/include/CEGUI' ]
+libafe_source_dirs = [ 'src/backend', 'src/backend/generators' ]
+libafe_sources = [ Glob( os.path.join( dir, '*.cc' ) ) for dir in libafe_source_dirs ]
+libafe_headers = [ Glob( os.path.join( dir, '*.h' ) ) for dir in libafe_source_dirs ]
 
-source_dirs = [ 'src/common', 'src/afe', 'src/afe/generators' ]
-sources = [ Glob( os.path.join( dir, '*.cc' ) ) for dir in source_dirs ]
-headers = [ Glob( os.path.join( dir, '*.h' ) ) for dir in source_dirs ]
+# Older versions of scons require:
+#libafe_sources = [ glob.glob( os.path.join( dir, '*.cc' ) ) for dir in libafe_source_dirs ]
+#libafe_headers = [ glob.glob( os.path.join( dir, '*.h' ) ) for dir in libafe_source_dirs ]
 
-env.Command( 'tags', sources + headers, 'ctags -o $TARGET $SOURCES' )
+env = Environment()
+env['ENV'] = {'PATH':os.environ['PATH'], 'TERM':os.environ['TERM'], 'HOME':os.environ['HOME']} # Environment varialbes required by colorgcc.
+env['LIBPATH'] = [ './', '/usr/local/lib' ]
+env['CCFLAGS'] = [ '-g', '-Wall', '-W', '-Wshadow', '-Wpointer-arith', '-Wcast-qual', '-Wwrite-strings', '-Wconversion', '-Winline', '-Wredundant-decls', '-Wno-unused', '-Wno-deprecated', '-msse2', '-mfpmath=sse' ] # '-O3'
+env['CPPPATH'] = [ './src' ]
+env['LIBS'] = [ 'GLEW', 'm', 'ctemplate', 'boost_python', 'boost_thread' ]
+env['SHLIBPREFIX'] = ""
 
-env.Program( source = sources, target = binary, LIBS = libraries, CCFLAGS = compiler_flags, CPPPATH = include_paths )
+# For people compiling boost themselves:
+#env['CPPPATH'] = [ './src', '/usr/local/include/boost-1_36' ]
+#env['LIBS'] = [ 'GLEW', 'm', 'ctemplate', 'boost_python-gcc41-mt', 'boost_thread-gcc41-mt' ]
+
+env.ParseConfig( 'python-config --includes' )
+env.ParseConfig( 'python-config --ldflags' )
+
+# Old python versions:
+#env.ParseConfig( 'python2.4-config --includes' )
+#env.ParseConfig( 'python2.4-config --ldflags' )
+
+env.SharedLibrary( source = libafe_sources, target = 'afepy' )
+
+env.Command( 'tags', libafe_sources + libafe_headers, 'ctags -o $TARGET $SOURCES' )

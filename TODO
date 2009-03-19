@@ -1,18 +1,9 @@
-Give the user a clue about WASD, QE, & the spacebar.
+When the window is scaled, the perspective of the fractal should be kept 1:1.
 
-Add mousewheel zooming.
+Uniform variables need to either be:
+    a) Not set when they aren't used in the shader program
+    b) Always referenced in the shader program (drivers will otherwise optimize them out).
 
-Label the opacity slider.
+Fullscreen mode would be nice.
 
-Make the resolution adjustable during runtime.
-
-Draw the fractal with a 1:1 ratio even when the resolution is not 1:1.
-
-There is a discontinuity for at (x,0) for x<0 when the exponent is a
-non integer. I'm not sure why this is. Maybe due to the math. I need to
-figure out if it's supposed to be there or not.
-
-Using polar coords is naturally more computationally expoensive. The
-checkbox in the julia control panel enabling the polar computatons is
-not hooked up yet. The program needs to be modified to make this
-selection matter.
+Mousewheel zooming.

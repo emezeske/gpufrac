@@ -1,4 +1,4 @@
-This is the Advanced Fractal Explorer.  Well, it's not very "advanced" yet, but it will be.
+This is the Advanced Fractal Explorer (AFE).
 
 ########################################################################################################
 # INSTALL
@@ -7,7 +7,7 @@ This is the Advanced Fractal Explorer.  Well, it's not very "advanced" yet, but 
 To build AFE, make sure you have the stuff in DEPENDENCIES installed.  Then:
 
     $ scons
-    $ ./advanced-fractal-explorer
+    $ ./afe
 
 Note that at the moment, AFE has to be run from the top-level source directory.
 
@@ -17,4 +17,4 @@ Note that at the moment, AFE has to be run from the top-level source directory.
 
 Author: Evan Mezeske.
 
-SleekSpace CEGUI skin: Eugene Tan (devhobby.blogspot.com).
+Contributors: Grady Weyenberg
