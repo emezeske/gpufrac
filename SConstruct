@@ -3,12 +3,8 @@ import os, glob
 SetOption( 'num_jobs', 4 ) # Set this to the number of processors you have.  TODO: Automate this.
 
 libafe_source_dirs = [ 'src/backend', 'src/backend/generators' ]
-libafe_sources = [ Glob( os.path.join( dir, '*.cc' ) ) for dir in libafe_source_dirs ]
-libafe_headers = [ Glob( os.path.join( dir, '*.h' ) ) for dir in libafe_source_dirs ]
-
-# Older versions of scons require:
-#libafe_sources = [ glob.glob( os.path.join( dir, '*.cc' ) ) for dir in libafe_source_dirs ]
-#libafe_headers = [ glob.glob( os.path.join( dir, '*.h' ) ) for dir in libafe_source_dirs ]
+libafe_sources = [ glob.glob( os.path.join( dir, '*.cc' ) ) for dir in libafe_source_dirs ]
+libafe_headers = [ glob.glob( os.path.join( dir, '*.h' ) ) for dir in libafe_source_dirs ]
 
 env = Environment()
 env['ENV'] = {'PATH':os.environ['PATH'], 'TERM':os.environ['TERM'], 'HOME':os.environ['HOME']} # Environment varialbes required by colorgcc.
