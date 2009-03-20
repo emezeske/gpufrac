@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import Image, wx, sys, time, numpy
+import Image, wx, sys, time, numpy, random
 from wx import xrc
 from wx import glcanvas
 from OpenGL.GLU import *
@@ -50,6 +50,15 @@ def calculate_frequency( slider_position ):
     else:
         frequency = 1.0 + ( ( frequency - SLIDER_NEUTRAL ) / SLIDER_NEUTRAL ) * MAX_FACTOR
     return frequency
+
+def random_phase():
+    return calculate_frequency( random.randint( -314, 314 ) )
+
+def random_amplitude():
+    return calculate_amplitude( random.randint( 0, 100 ) )
+
+def random_frequency():
+    return calculate_frequency( random.randint( 0, 100 ) )
 
 
 class JuliaCpuGenerator( object ):
@@ -120,6 +129,8 @@ class JuliaShaderGenerator( object ):
         self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_trig, id=xrc.XRCID( 'palette_mode_trig' ) )
 
         # TODO: There's gotta be some magical Pythonic way to do this without so much repitition:
+        # TODO: Move this stuff into its own class.
+        self.frame.Bind( wx.EVT_BUTTON, self.on_trig_randomize, id=xrc.XRCID( 'trig_randomize' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_red_phase, id=xrc.XRCID( 'red_phase' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_green_phase, id=xrc.XRCID( 'green_phase' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_blue_phase, id=xrc.XRCID( 'blue_phase' ) )
@@ -207,6 +218,18 @@ class JuliaShaderGenerator( object ):
 
     def on_palette_mode_trig( self, event ):
         self.generator.set_palette_mode( afepy.PaletteMode.PM_TRIG )
+
+    def on_trig_randomize( self, event ):
+        # TODO update the sliders with these values...
+        self.generator.set_red_phase( random_phase() )
+        self.generator.set_green_phase( random_phase() )
+        self.generator.set_blue_phase( random_phase() )
+        self.generator.set_red_amplitude( random_amplitude() )
+        self.generator.set_green_amplitude( random_amplitude() )
+        self.generator.set_blue_amplitude( random_amplitude() )
+        self.generator.set_red_frequency( random_frequency() )
+        self.generator.set_green_frequency( random_frequency() )
+        self.generator.set_blue_frequency( random_frequency() )
 
     def on_red_phase( self, event ):
         self.generator.set_red_phase( calculate_phase( event.GetInt() ) )

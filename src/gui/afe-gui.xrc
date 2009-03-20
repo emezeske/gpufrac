@@ -344,11 +344,31 @@
 						</object>
 						<object class="sizeritem">
 							<option>0</option>
-							<flag>wxALL</flag>
+							<flag>wxEXPAND</flag>
 							<border>5</border>
-							<object class="wxRadioButton" name="palette_mode_trig">
-								<label>Trig-Based Palette</label>
-								<value>1</value>
+							<object class="wxGridSizer">
+								<rows>1</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<object class="wxRadioButton" name="palette_mode_trig">
+										<label>Trig-Based Palette</label>
+										<value>1</value>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<object class="wxButton" name="trig_randomize">
+										<label>Randomize</label>
+										<default>0</default>
+									</object>
+								</object>
 							</object>
 						</object>
 						<object class="sizeritem">
