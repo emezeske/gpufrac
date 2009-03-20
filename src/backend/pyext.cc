@@ -15,8 +15,10 @@ BOOST_PYTHON_MODULE(afepy)
         .def( "init", &Shader::init ).staticmethod( "init" );
 
     py::enum_<ColoringMethod>( "ColoringMethod" )
-        .value( "CM_ITERATIVE",  CM_ITERATIVE )
-        .value( "CM_CONTINUOUS", CM_CONTINUOUS );
+        .value( "CM_ITERATIVE",      CM_ITERATIVE )
+        .value( "CM_CONTINUOUS",     CM_CONTINUOUS )
+        .value( "CM_RADIUS_SQUARED", CM_RADIUS_SQUARED )
+        .value( "CM_ANGLE",          CM_ANGLE );
 
     py::enum_<EscapeCondition>( "EscapeCondition" )
         .value( "EC_CIRCLE", EC_CIRCLE )
@@ -51,6 +53,7 @@ BOOST_PYTHON_MODULE(afepy)
         .def( "set_red_frequency",              &JuliaShader::set_red_frequency )
         .def( "set_green_frequency",            &JuliaShader::set_green_frequency )
         .def( "set_blue_frequency",             &JuliaShader::set_blue_frequency )
+        .def( "get_seed",                       &JuliaShader::get_seed )
         .def( "get_palette_offset",             &JuliaShader::get_palette_offset );
 
     py::class_<JuliaCpu, boost::noncopyable>( "JuliaCpu" )

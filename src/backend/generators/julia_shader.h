@@ -10,7 +10,9 @@ typedef std::vector<char> ByteVector;
 enum ColoringMethod
 {
     CM_ITERATIVE,
-    CM_CONTINUOUS
+    CM_CONTINUOUS,
+    CM_RADIUS_SQUARED,
+    CM_ANGLE
 };
 
 enum EscapeCondition
@@ -55,6 +57,7 @@ struct JuliaShader
     void set_green_frequency( const float green_frequency ) { green_frequency_ = green_frequency; }
     void set_blue_frequency( const float blue_frequency ) { blue_frequency_ = blue_frequency; }
 
+    Vector2Df get_seed() const { return seed_; }
     float get_palette_offset() const { return palette_offset_; }
 
 private:

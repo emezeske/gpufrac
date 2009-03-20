@@ -22,22 +22,23 @@ float calculate_escape_magnitude( vec2 z )
         escape_magnitude = 0.0,
         half_julia_exponent = julia_exponent / 2.0;
 
-    for ( int i = 0; i < max_iterations; ++i )
+    int iteration = 0;
+
+    float
+        radius_squared = 0.0,
+        z_x_squared,
+        z_y_squared;
+
+    for ( ; iteration < max_iterations; ++iteration )
     {
-        float
-            z_x_squared = z.x * z.x,
-            z_y_squared = z.y * z.y,
-            radius_squared = z_x_squared + z_y_squared;
+        z_x_squared = z.x * z.x;
+        z_y_squared = z.y * z.y;
+        radius_squared = z_x_squared + z_y_squared;
 
         {{#COLORING_METHOD_CONTINUOUS}}
             escape_magnitude += exp( -sqrt( radius_squared ) ); // e ^( -radius )
-            // escape_magnitude = i + 1 - log( log( sqrt( radius_squared ) ) / log( 2.0 ) ) / log( 2.0 );
+            // escape_magnitude = iteration + 1 - log( log( sqrt( radius_squared ) ) / log( 2.0 ) ) / log( 2.0 );
         {{/COLORING_METHOD_CONTINUOUS}}
-
-        {{#COLORING_METHOD_ITERATIVE}}
-            escape_magnitude = float( i ) / float( max_iterations );
-            // escape_magnitude = 2 * pow( 1 - ( float( i ) / float( max_iterations ) ), color_exponent );
-        {{/COLORING_METHOD_ITERATIVE}}
 
         {{#ESCAPE_CONDITION_CIRCLE}}
             if ( radius_squared > 4.0 ) break;      
@@ -59,6 +60,20 @@ float calculate_escape_magnitude( vec2 z )
             z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + seed;
         {{/ITERATOR_CARTESIAN}}
     }
+
+    {{#COLORING_METHOD_ITERATIVE}}
+        escape_magnitude = float( iteration );
+        // escape_magnitude = float( iteration ) / float( max_iterations );
+        // escape_magnitude = 2 * pow( 1 - ( float( iteration ) / float( max_iterations ) ), color_exponent );
+    {{/COLORING_METHOD_ITERATIVE}}
+
+    {{#COLORING_METHOD_RADIUS_SQUARED}}
+        escape_magnitude = radius_squared;
+    {{/COLORING_METHOD_RADIUS_SQUARED}}
+
+    {{#COLORING_METHOD_ANGLE}}
+        escape_magnitude = atan( z.y, z.x );
+    {{/COLORING_METHOD_ANGLE}}
 
     return escape_magnitude;
 }

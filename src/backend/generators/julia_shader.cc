@@ -8,8 +8,10 @@
 namespace {
 
 const std::map<ColoringMethod, cstring> coloring_methods = boost::assign::map_list_of
-    ( CM_ITERATIVE,  "COLORING_METHOD_ITERATIVE" )
-    ( CM_CONTINUOUS, "COLORING_METHOD_CONTINUOUS" );
+    ( CM_ITERATIVE,      "COLORING_METHOD_ITERATIVE" )
+    ( CM_CONTINUOUS,     "COLORING_METHOD_CONTINUOUS" )
+    ( CM_RADIUS_SQUARED, "COLORING_METHOD_RADIUS_SQUARED" )
+    ( CM_ANGLE,          "COLORING_METHOD_ANGLE" );
 
 const std::map<EscapeCondition, cstring> escape_conditions = boost::assign::map_list_of
     ( EC_BOX,    "ESCAPE_CONDITION_BOX" )

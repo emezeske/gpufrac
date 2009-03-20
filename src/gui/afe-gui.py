@@ -10,8 +10,10 @@ sys.path.append( './' )
 import afepy
 
 COLORING_METHODS = {
-    'Stepped' : afepy.ColoringMethod.CM_ITERATIVE,
-    'Smooth'  : afepy.ColoringMethod.CM_CONTINUOUS
+    'Continuous'     : afepy.ColoringMethod.CM_CONTINUOUS,
+    'Stepped'        : afepy.ColoringMethod.CM_ITERATIVE,
+    'Radius Squared' : afepy.ColoringMethod.CM_RADIUS_SQUARED,
+    'Angle'          : afepy.ColoringMethod.CM_ANGLE
 }
 
 ESCAPE_CONDITIONS = {
@@ -92,19 +94,31 @@ class JuliaShaderGenerator( object ):
         self.generator = afepy.JuliaShader()
         self.palette_cycle_speed = 0.0
         self.frame = xml_resource.LoadFrame( self.fractal_frame, 'julia_shader_settings_frame' )
+
+        self.seed_real_text_ctrl = xrc.XRCCTRL( self.frame, 'seed_real' )
+        self.seed_imag_text_ctrl = xrc.XRCCTRL( self.frame, 'seed_imag' )
+        seed = self.generator.get_seed()
+        self.set_seed_text_ctrl( seed.x, seed.y )
+
+        self.multisampling_checkbox = xrc.XRCCTRL( self.frame, 'multisampling' )
+
+        self.frame.Bind( wx.EVT_TEXT_ENTER, self.on_seed_real, id=xrc.XRCID( 'seed_real' ) )
+        self.frame.Bind( wx.EVT_TEXT_ENTER, self.on_seed_imag, id=xrc.XRCID( 'seed_imag' ) )
         self.frame.Bind( wx.EVT_CHECKBOX, self.on_multisampling, id=xrc.XRCID( 'multisampling' ) )
         self.frame.Bind( wx.EVT_CHECKBOX, self.on_normal_mapping, id=xrc.XRCID( 'normal_mapping' ) )
         self.frame.Bind( wx.EVT_CHOICE, self.on_coloring_method, id=xrc.XRCID( 'coloring_method' ) )
         self.frame.Bind( wx.EVT_CHOICE, self.on_escape_condition, id=xrc.XRCID( 'escape_condition' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_max_iterations, id=xrc.XRCID( 'max_iterations' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_palette_cycle_speed, id=xrc.XRCID( 'palette_cycle_speed' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_palette_stretch, id=xrc.XRCID( 'palette_stretch' ) )
         self.frame.Bind( wx.EVT_CHECKBOX, self.on_enable_arbitrary_exponent, id=xrc.XRCID( 'enable_arbitrary_exponent' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_julia_exponent, id=xrc.XRCID( 'julia_exponent' ) )
-        self.frame.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_palette_image_file_picker, id=xrc.XRCID( 'palette_image_file_picker' ) )
+
+        self.frame.Bind( wx.EVT_SLIDER, self.on_palette_cycle_speed, id=xrc.XRCID( 'palette_cycle_speed' ) )
+        self.frame.Bind( wx.EVT_SLIDER, self.on_palette_stretch, id=xrc.XRCID( 'palette_stretch' ) )
         self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_texture, id=xrc.XRCID( 'palette_mode_texture' ) )
+        self.frame.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_palette_image_file_picker, id=xrc.XRCID( 'palette_image_file_picker' ) )
         self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_magnitude, id=xrc.XRCID( 'palette_mode_magnitude' ) )
         self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_trig, id=xrc.XRCID( 'palette_mode_trig' ) )
+
         # TODO: There's gotta be some magical Pythonic way to do this without so much repitition:
         self.frame.Bind( wx.EVT_SLIDER, self.on_red_phase, id=xrc.XRCID( 'red_phase' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_green_phase, id=xrc.XRCID( 'green_phase' ) )
@@ -115,6 +129,7 @@ class JuliaShaderGenerator( object ):
         self.frame.Bind( wx.EVT_SLIDER, self.on_red_frequency, id=xrc.XRCID( 'red_frequency' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_green_frequency, id=xrc.XRCID( 'green_frequency' ) )
         self.frame.Bind( wx.EVT_SLIDER, self.on_blue_frequency, id=xrc.XRCID( 'blue_frequency' ) )
+
         self.frame.Show()
 
     def do_one_step( self, elapsed_time ):
@@ -123,10 +138,32 @@ class JuliaShaderGenerator( object ):
     def draw_fractal( self, width, height, viewport ):
         self.generator.draw( afepy.Vector2Di( width, height ), viewport.position(), viewport.size() )
 
+    def set_seed_text_ctrl( self, real, imag ):
+        self.seed_real_text_ctrl.SetValue( '%.4g' % real )
+        self.seed_imag_text_ctrl.SetValue( '%.4g' % imag )
+
+    def on_seed_real( self, event ):
+        seed = self.generator.get_seed()
+        try:
+            seed.x = float( event.GetString() )
+        except: return
+        self.generator.set_seed( seed )
+
+    def on_seed_imag( self, event ):
+        seed = self.generator.get_seed()
+        try:
+            seed.y = float( event.GetString() )
+        except: return
+        self.generator.set_seed( seed )
+
     def on_multisampling( self, event ):
         self.generator.set_multisampling_enabled( event.IsChecked() )
 
     def on_normal_mapping( self, event ):
+        if event.IsChecked():
+            # Multisampling is required for normal mapping to work.
+            self.multisampling_checkbox.SetValue( True )
+            self.generator.set_multisampling_enabled( True )
         self.generator.set_normal_mapping_enabled( event.IsChecked() )
 
     def on_coloring_method( self, event ):
@@ -137,6 +174,12 @@ class JuliaShaderGenerator( object ):
 
     def on_max_iterations( self, event ):
         self.generator.set_max_iterations( event.GetInt() )
+
+    def on_enable_arbitrary_exponent( self, event ):
+        self.generator.set_arbitrary_exponent_enabled( event.IsChecked() )
+
+    def on_julia_exponent( self, event ):
+        self.generator.set_julia_exponent( round( event.GetInt() / 10.0 ) )
 
     def on_palette_cycle_speed( self, event ):
         self.palette_cycle_speed = event.GetInt()
@@ -151,19 +194,13 @@ class JuliaShaderGenerator( object ):
             stretch = 1.0 + ( ( stretch - SLIDER_NEUTRAL ) / SLIDER_NEUTRAL ) * MAX_STRETCH_FACTOR
         self.generator.set_palette_stretch( stretch )
 
-    def on_enable_arbitrary_exponent( self, event ):
-        self.generator.set_arbitrary_exponent_enabled( event.IsChecked() )
-
-    def on_julia_exponent( self, event ):
-        self.generator.set_julia_exponent( event.GetInt() / 100.0 )
+    def on_palette_mode_texture( self, event ):
+        self.generator.set_palette_mode( afepy.PaletteMode.PM_TEXTURE )
 
     def on_palette_image_file_picker( self, event ):
         self.fractal_frame.canvas.SetCurrent()
         data, width, height = get_image_for_opengl( event.GetPath() )
         self.generator.set_palette_texture( data, width, height )
-
-    def on_palette_mode_texture( self, event ):
-        self.generator.set_palette_mode( afepy.PaletteMode.PM_TEXTURE )
 
     def on_palette_mode_magnitude( self, event ):
         self.generator.set_palette_mode( afepy.PaletteMode.PM_MAGNITUDE )
@@ -203,9 +240,10 @@ class JuliaShaderGenerator( object ):
 
     def on_fractal_motion( self, event ):
         if event.Dragging():
-            x = 2.0 * ( float( event.GetX() ) / self.fractal_frame.width() - 0.5 )
-            y = 2.0 * ( float( self.fractal_frame.height() - event.GetY() ) / self.fractal_frame.height() - 0.5 )
-            self.generator.set_seed( afepy.Vector2Df( x, y ) )
+            real = 2.0 * ( float( event.GetX() ) / self.fractal_frame.width() - 0.5 )
+            imag = 2.0 * ( float( self.fractal_frame.height() - event.GetY() ) / self.fractal_frame.height() - 0.5 )
+            self.set_seed_text_ctrl( real, imag )
+            self.generator.set_seed( afepy.Vector2Df( real, imag ) )
             event.Skip()
 
     def on_fractal_key_down( self, event ):
