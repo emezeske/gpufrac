@@ -2,12 +2,14 @@ Uniform variables need to either be:
     a) Not set when they aren't used in the shader program
     b) Always referenced in the shader program (drivers will otherwise optimize them out).
 
-Fullscreen mode would be nice.
+Save videos to disk, maybe?
 
-Mousewheel zooming would be nice.
+Mousewheel zooming.
 
 Flesh out the JuliaCpu generator so that it supports the same settings as JuliaShader.
 
 Optimize the JuliaCpu generator, possibly by hand-assembling the tightest part of the loop, using SSE.
 
 Would be nice to build the C++ object files in an out-of-source directory.
+
+Consider the possibility of rewriting the Shader, JuliaShader, and Viewport classes in python.

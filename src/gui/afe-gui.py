@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import Image, wx, sys, time, numpy, random
+import Image, wx, sys, time, numpy, random, glob, re
 from wx import xrc
 from wx import glcanvas
 from OpenGL.GL import *
@@ -27,6 +27,14 @@ MULTISAMPLING_MODES = {
 }
 
 UPDATE_INTERVAL_MS = 10
+
+SCREENSHOT_DIR = 'screenshots'
+
+def sort_nicely( l ): 
+    """ Sort the given list in the way that humans expect. """ 
+    convert = lambda text: int( text ) if text.isdigit() else text 
+    alphanum_key = lambda key: [ convert( c ) for c in re.split( '([0-9]+)', key ) ] 
+    l.sort( key=alphanum_key ) 
 
 def get_image_for_opengl( filename ):
     image = Image.open( filename )
@@ -292,20 +300,42 @@ class AfeGlFrame( wx.Frame ):
     def on_key_down( self, event ):
         if event.GetKeyCode() == wx.WXK_ESCAPE:
             sys.exit( 0 )
+        elif event.GetKeyCode() == wx.WXK_TAB:
+            self.ShowFullScreen( not self.IsFullScreen() )
+        elif event.GetKeyCode() == wx.WXK_SPACE:
+            self.take_screenshot()
         elif event.GetKeyCode() in range(0, 256):
             char = chr( event.GetKeyCode() )
             self.depressed_keys[char] = True
             self.update_pan_velocity()
             self.update_zoom_velocity()
-        #elif self.generator_frame: self.generator_frame.on_fractal_key_down( event )
 
     def on_key_up( self, event ):
         if event.GetKeyCode() in range(0, 256):
             char = chr( event.GetKeyCode() )
-            self.depressed_keys[char] = False
-            self.update_pan_velocity()
-            self.update_zoom_velocity()
-        #if self.generator_frame: self.generator_frame.on_fractal_key_up( event )
+            if self.depressed_keys.get( char ):
+                self.depressed_keys[char] = False
+                self.update_pan_velocity()
+                self.update_zoom_velocity()
+
+    def take_screenshot( self ):
+        context = wx.ClientDC( self )
+        memory = wx.MemoryDC()
+        x, y = self.GetClientSizeTuple()
+        bitmap = wx.EmptyBitmap( x, y, -1 )
+        memory.SelectObject( bitmap )
+        memory.Blit( 0, 0, x, y, context, 0, 0 )
+        memory.SelectObject( wx.NullBitmap )
+
+        filename_id = 0
+        existing_files = glob.glob( SCREENSHOT_DIR + '/AFE-*.png' )
+        if existing_files: 
+            matches = [ re.search( '([0-9]+)', file ) for file in existing_files ]
+            ids = [ int( match.group(1) ) for match in matches if match ]
+            if ids: filename_id = max( ids ) + 1
+        filename = SCREENSHOT_DIR + '/AFE-%d.png' % filename_id
+        print 'Saving to', filename
+        bitmap.SaveFile( filename, wx.BITMAP_TYPE_PNG )
 
     def update_pan_velocity( self ):
         pan_velocity = afepy.Vector2Df( 0.0, 0.0 )
@@ -329,7 +359,6 @@ class AfeGlFrame( wx.Frame ):
         self.set_viewport()
         afepy.Shader.init()
         self.generator_frame = JuliaShaderGenerator( self, self.xml_resource )
-        #self.generator_frame = JuliaCpuGenerator( self, self.xml_resource )
 
     def set_viewport( self ):
         glViewport( 0, 0, self.width(), self.height() )
