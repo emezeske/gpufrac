@@ -56,6 +56,7 @@ JuliaShader::JuliaShader() :
     blue_frequency_( 1.0f ),
     green_frequency_( 1.0f ),
     max_iterations_( 128 ),
+    mandelbrot_mode_enabled_( false ),
     normal_mapping_enabled_( false ),
     arbitrary_exponent_enabled_( false ),
     coloring_method_( CM_CONTINUOUS ),
@@ -63,6 +64,12 @@ JuliaShader::JuliaShader() :
     palette_mode_( PM_TRIG ),
     multisampling_mode_( MS_NONE )
 {
+    load_shader_program();
+}
+
+void JuliaShader::set_mandelbrot_mode_enabled( const bool mandelbrot_mode_enabled )
+{
+    mandelbrot_mode_enabled_ = mandelbrot_mode_enabled;
     load_shader_program();
 }
 
@@ -124,6 +131,9 @@ void JuliaShader::load_shader_program()
     dictionary.ShowSection( map_lookup( coloring_methods, coloring_method_ ) );
     dictionary.ShowSection( map_lookup( palette_modes, palette_mode_ ) );
     dictionary.ShowSection( map_lookup( multisampling_modes, multisampling_mode_ ) );
+
+    if ( mandelbrot_mode_enabled_ ) dictionary.ShowSection( "MANDELBROT_MODE_ENABLED" );
+    else dictionary.ShowSection( "MANDELBROT_MODE_DISABLED" );
 
     if ( normal_mapping_enabled_ ) dictionary.ShowSection( "NORMAL_MAPPING_ENABLED" );
     else dictionary.ShowSection( "NORMAL_MAPPING_DISABLED" );

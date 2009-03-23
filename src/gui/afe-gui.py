@@ -88,6 +88,7 @@ class GeneralSettings( object ):
         parent.Bind( wx.EVT_CHOICE, self.on_coloring_method, id=xrc.XRCID( 'coloring_method' ) )
         parent.Bind( wx.EVT_CHOICE, self.on_escape_condition, id=xrc.XRCID( 'escape_condition' ) )
         parent.Bind( wx.EVT_CHOICE, self.on_multisampling, id=xrc.XRCID( 'multisampling_mode' ) )
+        parent.Bind( wx.EVT_CHECKBOX, self.on_mandelbrot_mode, id=xrc.XRCID( 'mandelbrot_mode' ) )
         parent.Bind( wx.EVT_CHECKBOX, self.on_normal_mapping, id=xrc.XRCID( 'normal_mapping' ) )
         parent.Bind( wx.EVT_SLIDER, self.on_height_scale, id=xrc.XRCID( 'height_scale' ) )
         parent.Bind( wx.EVT_SLIDER, self.on_max_iterations, id=xrc.XRCID( 'max_iterations' ) )
@@ -120,6 +121,9 @@ class GeneralSettings( object ):
 
     def on_multisampling( self, event ):
         self.generator.set_multisampling_mode( MULTISAMPLING_MODES.get( event.GetString() ) )
+
+    def on_mandelbrot_mode( self, event ):
+        self.generator.set_mandelbrot_mode_enabled( event.IsChecked() )
 
     def on_normal_mapping( self, event ):
         self.generator.set_normal_mapping_enabled( event.IsChecked() )

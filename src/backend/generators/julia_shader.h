@@ -47,6 +47,7 @@ struct JuliaShader
     void set_julia_exponent( const float julia_exponent ) { julia_exponent_ = julia_exponent; }
     void set_height_scale( const float height_scale ) { height_scale_ = height_scale; }
     void set_max_iterations( const int max_iterations ) { max_iterations_ = max_iterations; }
+    void set_mandelbrot_mode_enabled( const bool mandelbrot_mode_enabled );
     void set_normal_mapping_enabled( const bool normal_mapping_enabled );
     void set_arbitrary_exponent_enabled( const bool arbitrary_exponent_enabled );
     void set_coloring_method( const ColoringMethod coloring_method );
@@ -92,6 +93,7 @@ private:
     int max_iterations_;
 
     bool
+        mandelbrot_mode_enabled_,
         normal_mapping_enabled_,
         arbitrary_exponent_enabled_;
     

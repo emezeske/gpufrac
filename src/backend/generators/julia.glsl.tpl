@@ -26,6 +26,14 @@ float calculate_escape_magnitude( vec2 z )
 
     float radius_squared = 0.0;
 
+    {{#MANDELBROT_MODE_ENABLED}}
+        vec2 use_seed = z; // TODO: Better name?
+    {{/MANDELBROT_MODE_ENABLED}}
+
+    {{#MANDELBROT_MODE_DISABLED}}
+        vec2 use_seed = seed;
+    {{/MANDELBROT_MODE_DISABLED}}
+
     for ( ; iteration < max_iterations; ++iteration )
     {
         float
@@ -36,7 +44,6 @@ float calculate_escape_magnitude( vec2 z )
 
         {{#COLORING_METHOD_CONTINUOUS}}
             escape_magnitude += exp( -sqrt( radius_squared ) ); // e ^( -radius )
-            // escape_magnitude = iteration + 1 - log( log( sqrt( radius_squared ) ) / log( 2.0 ) ) / log( 2.0 );
         {{/COLORING_METHOD_CONTINUOUS}}
 
         {{#ESCAPE_CONDITION_CIRCLE}}
@@ -52,11 +59,11 @@ float calculate_escape_magnitude( vec2 z )
                 new_theta = julia_exponent * atan( z.y, z.x ),
                 new_radius = pow( radius_squared, half_julia_exponent );
 
-            z = vec2( new_radius * cos( new_theta ), new_radius * sin( new_theta ) ) + seed;
+            z = vec2( new_radius * cos( new_theta ), new_radius * sin( new_theta ) ) + use_seed;
         {{/ITERATOR_POLAR}}
 
         {{#ITERATOR_CARTESIAN}}
-            z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + seed;
+            z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + use_seed;
         {{/ITERATOR_CARTESIAN}}
     }
 
@@ -78,11 +85,12 @@ float calculate_escape_magnitude( vec2 z )
 vec3 palette_lookup( float escape_magnitude )
 {
     escape_magnitude *= palette_stretch;
-    escape_magnitude += palette_offset; // TODO Stretch offset?
+    escape_magnitude += palette_offset; // TODO: Stretch offset?
+
+    // TODO: The palette cycling speed varies pretty drastically between the various palette modes.
+    //       Figure out some way to make the apparent speed more uniform.
 
     {{#PALETTE_MODE_TEXTURE}}
-        // TODO
-        // escape_magnitude /= max_iterations;
         return texture2D( palette, vec2( escape_magnitude, 0.0 ) ).rgb;
     {{/PALETTE_MODE_TEXTURE}}
 
@@ -93,7 +101,6 @@ vec3 palette_lookup( float escape_magnitude )
     {{/PALETTE_MODE_TRIG}}
 
     {{#PALETTE_MODE_MAGNITUDE}}
-        // TODO
         return vec3( escape_magnitude, escape_magnitude, escape_magnitude );
     {{/PALETTE_MODE_MAGNITUDE}}
 }
@@ -108,10 +115,6 @@ vec3 get_color( vec2 z )
 {{#NORMAL_MAPPING_ENABLED}}
 vec3 get_color( vec2 z_a )
 {
-    //
-    // TODO: These calculations could be simplified if we assume the light vector is always going to be (0,0,1).
-    //
-
     float offset = pixel_width / 2.0;
 
     vec2
@@ -137,7 +140,9 @@ vec3 get_color( vec2 z_a )
     vec3 normal = normalize( cross( point_b - point_a, point_c - point_a ) );
 
     // Multiply the color by the cosine of the angle between the face's normal and the light vector.
+    // TODO Make the light vector configurable.
     return base_color * dot( normal, vec3( 0.0, 0.0, 1.00 ) );
+    // return base_color * dot( normal, normalize( vec3( 0.0, 0.20, 0.80 ) ) );
 }
 {{/NORMAL_MAPPING_ENABLED}}
 

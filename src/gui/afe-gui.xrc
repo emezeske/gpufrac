@@ -162,6 +162,23 @@
 						</object>
 						<object class="sizeritem">
 							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxCheckBox" name="mandelbrot_mode">
+								<label>Mandelbrot Mode</label>
+								<checked>0</checked>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxEXPAND | wxALL</flag>
+							<border>5</border>
+							<object class="wxStaticLine" name="m_staticline1112">
+								<style>wxLI_HORIZONTAL</style>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
 							<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
 							<object class="wxCheckBox" name="normal_mapping">
