@@ -160,13 +160,27 @@ void JuliaShader::set_uniform_variables( const float pixel_width )
     glGetError();
 }
 
+#include <sys/time.h>
+#include <time.h>
+
 void JuliaShader::draw( const Vector2Di& screen_size, const Vector2Df& viewport_position, const Vector2Df& viewport_size )
 {
     shader_.enable();
 
     float pixel_width = viewport_size.x_ / static_cast<float>( screen_size.x_ ); // Assumes square pixels.
     set_uniform_variables( pixel_width );
+
+    // FIXME Just here for testing.
+    // struct timeval begin;
+    // gettimeofday( &begin, NULL );
+
     shader_.draw( screen_size, viewport_position, viewport_size );
 
     shader_.disable();
+
+    // FIXME Just here for testing.
+    glFinish();
+    // struct timeval end;
+    // gettimeofday( &end, NULL );
+    // VNOTIFY( FAULT, "shader draw took %d ms.", ( end.tv_sec - begin.tv_sec ) * 1000 + ( end.tv_usec - begin.tv_usec ) / 1000 );
 }

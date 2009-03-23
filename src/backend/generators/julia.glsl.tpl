@@ -24,15 +24,14 @@ float calculate_escape_magnitude( vec2 z )
 
     int iteration = 0;
 
-    float
-        radius_squared = 0.0,
-        z_x_squared,
-        z_y_squared;
+    float radius_squared = 0.0;
 
     for ( ; iteration < max_iterations; ++iteration )
     {
-        z_x_squared = z.x * z.x;
-        z_y_squared = z.y * z.y;
+        float
+            z_x_squared = z.x * z.x,
+            z_y_squared = z.y * z.y;
+
         radius_squared = z_x_squared + z_y_squared;
 
         {{#COLORING_METHOD_CONTINUOUS}}

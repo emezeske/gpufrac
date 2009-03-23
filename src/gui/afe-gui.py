@@ -3,7 +3,6 @@
 import Image, wx, sys, time, numpy, random
 from wx import xrc
 from wx import glcanvas
-from OpenGL.GLU import *
 from OpenGL.GL import *
 
 sys.path.append( './' )
@@ -23,46 +22,28 @@ ESCAPE_CONDITIONS = {
 
 UPDATE_INTERVAL_MS = 10
 
-
 def get_image_for_opengl( filename ):
     image = Image.open( filename )
     data = afepy.ByteVector()
-    # This is not exactly "efficient", but it works.  Maybe just move this into the C++ code and pass in a filename.
     for pixel in image.getdata():
         data.append( chr( pixel[0] ) )
         data.append( chr( pixel[1] ) )
         data.append( chr( pixel[2] ) )
     return ( data, image.size[0], image.size[1] )
 
-def calculate_phase( slider_position ):
-    return slider_position / 100.0
-
-def calculate_amplitude( slider_position ):
-    return slider_position / 100.0
-
-def calculate_frequency( slider_position ):
-    # TODO This is very much the same as the stretch factor calculation below.  Factor out the commonality?
-    SLIDER_NEUTRAL = 50.0
-    MAX_FACTOR = 25.0
-    frequency = slider_position
-    if frequency < SLIDER_NEUTRAL:
-        frequency = 1.0 / ( ( ( SLIDER_NEUTRAL - frequency ) / SLIDER_NEUTRAL ) * MAX_FACTOR )
+def slider_to_scaling_factor( slider_value, neutral, max_scaling ):
+    """ 
+        Returns a value v such that ( 1 / max_scaling ) < v < max_scaling.
+        The neutral position is the slider value that corresponds with 1.0.
+    """
+    scaling = float( slider_value )
+    if scaling < neutral:
+        scaling = 1.0 / ( ( ( neutral - scaling ) / neutral ) * max_scaling )
     else:
-        frequency = 1.0 + ( ( frequency - SLIDER_NEUTRAL ) / SLIDER_NEUTRAL ) * MAX_FACTOR
-    return frequency
-
-def random_phase():
-    return calculate_frequency( random.randint( -314, 314 ) )
-
-def random_amplitude():
-    return calculate_amplitude( random.randint( 0, 100 ) )
-
-def random_frequency():
-    return calculate_frequency( random.randint( 0, 100 ) )
-
+        scaling = 1.0 + ( ( scaling - neutral ) / neutral ) * max_scaling
+    return scaling
 
 class JuliaCpuGenerator( object ):
-
     def __init__( self, fractal_frame, xml_resource ):
         self.fractal_frame = fractal_frame
         self.generator = afepy.JuliaCpu()
@@ -71,16 +52,13 @@ class JuliaCpuGenerator( object ):
         self.frame.Show()
 
     def do_one_step( self, elapsed_time ):
-        return
+        pass
 
     def draw_fractal( self, width, height, viewport ):
         self.generator.draw( afepy.Vector2Di( width, height ), viewport.position(), viewport.size() )
 
     def on_max_iterations( self, event ):
         self.generator.set_max_iterations( event.GetInt() )
-
-    def on_fractal_left_down( self, event ):
-        return
 
     def on_fractal_motion( self, event ):
         if event.Dragging():
@@ -89,65 +67,25 @@ class JuliaCpuGenerator( object ):
             self.generator.set_seed( afepy.Vector2Df( x, y ) )
             event.Skip()
 
-    def on_fractal_key_down( self, event ):
-        return
-
-    def on_fractal_key_up( self, event ):
-        return
-
-
-class JuliaShaderGenerator( object ):
-
-    def __init__( self, fractal_frame, xml_resource ):
-        self.fractal_frame = fractal_frame
-        self.generator = afepy.JuliaShader()
-        self.palette_cycle_speed = 0.0
-        self.frame = xml_resource.LoadFrame( self.fractal_frame, 'julia_shader_settings_frame' )
-
-        self.seed_real_text_ctrl = xrc.XRCCTRL( self.frame, 'seed_real' )
-        self.seed_imag_text_ctrl = xrc.XRCCTRL( self.frame, 'seed_imag' )
+class GeneralSettings( object ):
+    def __init__( self, parent, generator ):
+        self.generator = generator
+        self.seed_real_text_ctrl = xrc.XRCCTRL( parent, 'seed_real' )
+        self.seed_imag_text_ctrl = xrc.XRCCTRL( parent, 'seed_imag' )
         seed = self.generator.get_seed()
         self.set_seed_text_ctrl( seed.x, seed.y )
 
-        self.multisampling_checkbox = xrc.XRCCTRL( self.frame, 'multisampling' )
+        self.multisampling_checkbox = xrc.XRCCTRL( parent, 'multisampling' )
 
-        self.frame.Bind( wx.EVT_TEXT_ENTER, self.on_seed_real, id=xrc.XRCID( 'seed_real' ) )
-        self.frame.Bind( wx.EVT_TEXT_ENTER, self.on_seed_imag, id=xrc.XRCID( 'seed_imag' ) )
-        self.frame.Bind( wx.EVT_CHECKBOX, self.on_multisampling, id=xrc.XRCID( 'multisampling' ) )
-        self.frame.Bind( wx.EVT_CHECKBOX, self.on_normal_mapping, id=xrc.XRCID( 'normal_mapping' ) )
-        self.frame.Bind( wx.EVT_CHOICE, self.on_coloring_method, id=xrc.XRCID( 'coloring_method' ) )
-        self.frame.Bind( wx.EVT_CHOICE, self.on_escape_condition, id=xrc.XRCID( 'escape_condition' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_max_iterations, id=xrc.XRCID( 'max_iterations' ) )
-        self.frame.Bind( wx.EVT_CHECKBOX, self.on_enable_arbitrary_exponent, id=xrc.XRCID( 'enable_arbitrary_exponent' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_julia_exponent, id=xrc.XRCID( 'julia_exponent' ) )
-
-        self.frame.Bind( wx.EVT_SLIDER, self.on_palette_cycle_speed, id=xrc.XRCID( 'palette_cycle_speed' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_palette_stretch, id=xrc.XRCID( 'palette_stretch' ) )
-        self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_texture, id=xrc.XRCID( 'palette_mode_texture' ) )
-        self.frame.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_palette_image_file_picker, id=xrc.XRCID( 'palette_image_file_picker' ) )
-        self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_magnitude, id=xrc.XRCID( 'palette_mode_magnitude' ) )
-        self.frame.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_trig, id=xrc.XRCID( 'palette_mode_trig' ) )
-
-        # TODO: There's gotta be some magical Pythonic way to do this without so much repitition:
-        # TODO: Move this stuff into its own class.
-        self.frame.Bind( wx.EVT_BUTTON, self.on_trig_randomize, id=xrc.XRCID( 'trig_randomize' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_red_phase, id=xrc.XRCID( 'red_phase' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_green_phase, id=xrc.XRCID( 'green_phase' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_blue_phase, id=xrc.XRCID( 'blue_phase' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_red_amplitude, id=xrc.XRCID( 'red_amplitude' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_green_amplitude, id=xrc.XRCID( 'green_amplitude' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_blue_amplitude, id=xrc.XRCID( 'blue_amplitude' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_red_frequency, id=xrc.XRCID( 'red_frequency' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_green_frequency, id=xrc.XRCID( 'green_frequency' ) )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_blue_frequency, id=xrc.XRCID( 'blue_frequency' ) )
-
-        self.frame.Show()
-
-    def do_one_step( self, elapsed_time ):
-        self.generator.set_palette_offset( self.generator.get_palette_offset() + self.palette_cycle_speed * elapsed_time )
-
-    def draw_fractal( self, width, height, viewport ):
-        self.generator.draw( afepy.Vector2Di( width, height ), viewport.position(), viewport.size() )
+        parent.Bind( wx.EVT_TEXT_ENTER, self.on_seed_real, id=xrc.XRCID( 'seed_real' ) )
+        parent.Bind( wx.EVT_TEXT_ENTER, self.on_seed_imag, id=xrc.XRCID( 'seed_imag' ) )
+        parent.Bind( wx.EVT_CHECKBOX, self.on_multisampling, id=xrc.XRCID( 'multisampling' ) )
+        parent.Bind( wx.EVT_CHECKBOX, self.on_normal_mapping, id=xrc.XRCID( 'normal_mapping' ) )
+        parent.Bind( wx.EVT_CHOICE, self.on_coloring_method, id=xrc.XRCID( 'coloring_method' ) )
+        parent.Bind( wx.EVT_CHOICE, self.on_escape_condition, id=xrc.XRCID( 'escape_condition' ) )
+        parent.Bind( wx.EVT_SLIDER, self.on_max_iterations, id=xrc.XRCID( 'max_iterations' ) )
+        parent.Bind( wx.EVT_CHECKBOX, self.on_enable_arbitrary_exponent, id=xrc.XRCID( 'enable_arbitrary_exponent' ) )
+        parent.Bind( wx.EVT_SLIDER, self.on_julia_exponent, id=xrc.XRCID( 'julia_exponent' ) )
 
     def set_seed_text_ctrl( self, real, imag ):
         self.seed_real_text_ctrl.SetValue( '%.4g' % real )
@@ -157,15 +95,15 @@ class JuliaShaderGenerator( object ):
         seed = self.generator.get_seed()
         try:
             seed.x = float( event.GetString() )
-        except: return
-        self.generator.set_seed( seed )
+        except ValueError: pass
+        else: self.generator.set_seed( seed )
 
     def on_seed_imag( self, event ):
         seed = self.generator.get_seed()
         try:
             seed.y = float( event.GetString() )
-        except: return
-        self.generator.set_seed( seed )
+        except ValueError: pass
+        else: self.generator.set_seed( seed )
 
     def on_multisampling( self, event ):
         self.generator.set_multisampling_enabled( event.IsChecked() )
@@ -192,24 +130,66 @@ class JuliaShaderGenerator( object ):
     def on_julia_exponent( self, event ):
         self.generator.set_julia_exponent( round( event.GetInt() / 10.0 ) )
 
+class TrigPaletteSlider( object ):
+    def __init__( self, parent, color, setting, generator ):
+        self.color, self.setting, self.generator = color, setting, generator
+        self.id = self.color + '_' + self.setting
+        self.setter = getattr( self.generator, 'set_' + self.id ) 
+        self.slider = xrc.XRCCTRL( parent, self.id )
+        self.slider.Bind( wx.EVT_SLIDER, self.on_change )
+
+    def on_change( self, event ):
+        self.setter( self.scale( event.GetInt() ) )
+
+    def randomize( self ):
+        if self.setting == 'phase':
+            self.slider.SetValue( random.randint( -314, 314 ) )
+        elif self.setting in ( 'amplitude', 'frequency' ):
+            self.slider.SetValue( random.randint( 0, 100 ) )
+        self.setter( self.scale( self.slider.GetValue() ) )
+
+    def scale( self, slider_value ):
+        if self.setting in ( 'phase', 'amplitude' ):
+            return slider_value / 100.0
+        elif self.setting == 'frequency':
+            return slider_to_scaling_factor( slider_value, 50, 25.0 )
+    
+class TrigPaletteSettings( object ):
+    def __init__( self, parent, generator ):
+        parent.Bind( wx.EVT_BUTTON, self.on_randomize, id=xrc.XRCID( 'trig_randomize' ) )
+        self.sliders = []
+        for color in ( 'red', 'green', 'blue' ):
+            for setting in ( 'phase', 'amplitude', 'frequency' ):
+                self.sliders.append( TrigPaletteSlider( parent, color, setting, generator ) )
+
+    def on_randomize( self, event ):
+        for slider in self.sliders: slider.randomize()
+
+class PaletteSettings( object ):
+    def __init__( self, parent, generator, prepare_gl ):
+        self.parent = parent
+        self.generator = generator
+        self.prepare_gl = prepare_gl
+        self.cycle_speed = 0.0
+        parent.Bind( wx.EVT_SLIDER, self.on_palette_cycle_speed, id=xrc.XRCID( 'palette_cycle_speed' ) )
+        parent.Bind( wx.EVT_SLIDER, self.on_palette_stretch, id=xrc.XRCID( 'palette_stretch' ) )
+        parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_texture, id=xrc.XRCID( 'palette_mode_texture' ) )
+        parent.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_palette_image_file_picker, id=xrc.XRCID( 'palette_image_file_picker' ) )
+        parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_magnitude, id=xrc.XRCID( 'palette_mode_magnitude' ) )
+        parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_trig, id=xrc.XRCID( 'palette_mode_trig' ) )
+        self.trig_settings = TrigPaletteSettings( parent, self.generator )
+
     def on_palette_cycle_speed( self, event ):
-        self.palette_cycle_speed = event.GetInt()
+        self.cycle_speed = event.GetInt()
 
     def on_palette_stretch( self, event ):
-        SLIDER_NEUTRAL = 50.0
-        MAX_STRETCH_FACTOR = 25.0
-        stretch = event.GetInt()
-        if stretch < SLIDER_NEUTRAL:
-            stretch = 1.0 / ( ( ( SLIDER_NEUTRAL - stretch ) / SLIDER_NEUTRAL ) * MAX_STRETCH_FACTOR )
-        else:
-            stretch = 1.0 + ( ( stretch - SLIDER_NEUTRAL ) / SLIDER_NEUTRAL ) * MAX_STRETCH_FACTOR
-        self.generator.set_palette_stretch( stretch )
+        self.generator.set_palette_stretch( slider_to_scaling_factor( event.GetInt(), 50, 25.0 ) )
 
     def on_palette_mode_texture( self, event ):
         self.generator.set_palette_mode( afepy.PaletteMode.PM_TEXTURE )
 
     def on_palette_image_file_picker( self, event ):
-        self.fractal_frame.canvas.SetCurrent()
+        self.prepare_gl()
         data, width, height = get_image_for_opengl( event.GetPath() )
         self.generator.set_palette_texture( data, width, height )
 
@@ -218,66 +198,31 @@ class JuliaShaderGenerator( object ):
 
     def on_palette_mode_trig( self, event ):
         self.generator.set_palette_mode( afepy.PaletteMode.PM_TRIG )
+    
+class JuliaShaderGenerator( object ):
+    def __init__( self, fractal_frame, xml_resource ):
+        self.fractal_frame = fractal_frame
+        self.generator = afepy.JuliaShader()
+        self.frame = xml_resource.LoadFrame( self.fractal_frame, 'julia_shader_settings_frame' )
+        self.general_settings = GeneralSettings( self.frame, self.generator )
+        self.palette_settings = PaletteSettings( self.frame, self.generator, self.fractal_frame.canvas.SetCurrent )
+        self.frame.Show()
 
-    def on_trig_randomize( self, event ):
-        # TODO update the sliders with these values...
-        self.generator.set_red_phase( random_phase() )
-        self.generator.set_green_phase( random_phase() )
-        self.generator.set_blue_phase( random_phase() )
-        self.generator.set_red_amplitude( random_amplitude() )
-        self.generator.set_green_amplitude( random_amplitude() )
-        self.generator.set_blue_amplitude( random_amplitude() )
-        self.generator.set_red_frequency( random_frequency() )
-        self.generator.set_green_frequency( random_frequency() )
-        self.generator.set_blue_frequency( random_frequency() )
+    def do_one_step( self, elapsed_time ):
+        self.generator.set_palette_offset( self.generator.get_palette_offset() + self.palette_settings.cycle_speed * elapsed_time )
 
-    def on_red_phase( self, event ):
-        self.generator.set_red_phase( calculate_phase( event.GetInt() ) )
-
-    def on_green_phase( self, event ):
-        self.generator.set_green_phase( calculate_phase( event.GetInt() ) )
-
-    def on_blue_phase( self, event ):
-        self.generator.set_blue_phase( calculate_phase( event.GetInt() ) )
-
-    def on_red_amplitude( self, event ): 
-        self.generator.set_red_amplitude( calculate_amplitude( event.GetInt() ) )
-
-    def on_green_amplitude( self, event ):
-        self.generator.set_green_amplitude( calculate_amplitude( event.GetInt() ) )
-
-    def on_blue_amplitude( self, event ):
-        self.generator.set_blue_amplitude( calculate_amplitude( event.GetInt() ) )
-
-    def on_red_frequency( self, event ): 
-        self.generator.set_red_frequency( calculate_frequency( event.GetInt() ) )
-
-    def on_green_frequency( self, event ):
-        self.generator.set_green_frequency( calculate_frequency( event.GetInt() ) )
-
-    def on_blue_frequency( self, event ):
-        self.generator.set_blue_frequency( calculate_frequency( event.GetInt() ) )
-
-    def on_fractal_left_down( self, event ):
-        return
+    def draw_fractal( self, width, height, viewport ):
+        self.generator.draw( afepy.Vector2Di( width, height ), viewport.position(), viewport.size() )
 
     def on_fractal_motion( self, event ):
         if event.Dragging():
             real = 2.0 * ( float( event.GetX() ) / self.fractal_frame.width() - 0.5 )
             imag = 2.0 * ( float( self.fractal_frame.height() - event.GetY() ) / self.fractal_frame.height() - 0.5 )
-            self.set_seed_text_ctrl( real, imag )
+            self.general_settings.set_seed_text_ctrl( real, imag )
             self.generator.set_seed( afepy.Vector2Df( real, imag ) )
             event.Skip()
-
-    def on_fractal_key_down( self, event ):
-        return
-
-    def on_fractal_key_up( self, event ):
-        return
-
        
 class AfeGlFrame( wx.Frame ):
-
     def __init__( self, pos, size ):
         super( AfeGlFrame, self ).__init__( None, -1, 'AFE', pos, size, wx.DEFAULT_FRAME_STYLE, 'AFE' )
         self.xml_resource = xrc.XmlResource( 'src/gui/afe-gui.xrc' )
@@ -318,7 +263,7 @@ class AfeGlFrame( wx.Frame ):
     def on_size( self, event ):
         self.canvas.Show()
         self.canvas.SetCurrent()
-        self.init_viewport()
+        self.set_viewport()
         self.canvas.Refresh( False )
         event.Skip()
 
@@ -372,20 +317,26 @@ class AfeGlFrame( wx.Frame ):
         if self.depressed_keys.get( 'Q' ): zoom_velocity -= 1.0
         self.viewport.set_desired_zoom_velocity( zoom_velocity )
 
+    def remember_window_size( self ):
+        self.previous_window_size = (self.width(), self.height())
+
     def init_gl( self ):
         glClearColor( 0.0, 0.0, 0.0, 1.0 )
-        self.init_viewport()
+        self.set_viewport()
         afepy.Shader.init()
         self.generator_frame = JuliaShaderGenerator( self, self.xml_resource )
         #self.generator_frame = JuliaCpuGenerator( self, self.xml_resource )
 
-    def init_viewport( self ):
+    def set_viewport( self ):
         glViewport( 0, 0, self.width(), self.height() )
         glMatrixMode( GL_PROJECTION )
         glLoadIdentity()
         glOrtho( 0, self.width(), 0, self.height(), 0, 1.0 )
-
-
+        if hasattr( self, 'previous_window_size' ):
+            xscale = float( self.width() ) / self.previous_window_size[0]
+            yscale = float( self.height() ) / self.previous_window_size[1]
+            self.viewport.scale_extents( afepy.Vector2Df( xscale, yscale ) )
+        self.remember_window_size()
 
 def exception_hook( type, value, traceback ):
     sys.__excepthook__( type, value, traceback )

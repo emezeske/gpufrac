@@ -63,6 +63,7 @@ BOOST_PYTHON_MODULE(afepy)
 
     py::class_<Viewport, boost::noncopyable>( "Viewport", py::init<const Vector2Df&, const Vector2Df&>() )
         .def( "do_one_step",               &Viewport::do_one_step )
+        .def( "scale_extents",             &Viewport::scale_extents )
         .def( "set_desired_pan_velocity",  &Viewport::set_desired_pan_velocity )
         .def( "set_desired_zoom_velocity", &Viewport::set_desired_zoom_velocity )
         .def( "position",                  &Viewport::position, py::return_value_policy<py::copy_const_reference>() )

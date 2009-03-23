@@ -114,10 +114,20 @@ void Shader::print_with_line_numbers( cstring& shader_program )
     boost::algorithm::split( lines, shader_program, boost::algorithm::is_any_of( "\n" ) );
 
     NOTIFY( VERBOSE, "Loading shader program:" );
+
+    // Repeated blank lines are removed for readability.
+    bool last_line_was_blank = false;
     
     for ( stringv::size_type i = 0; i < lines.size(); ++i )
     {
-        VNOTIFY( VERBOSE, "%3d: %s", i + 1, lines[i].c_str() );
+        bool line_is_blank = lines[i].find_first_not_of( " \t" ) == cstring::npos;
+
+        if ( !line_is_blank || !last_line_was_blank )
+        {
+            VNOTIFY( VERBOSE, "%3d: %s", i + 1, lines[i].c_str() );
+        }
+
+        last_line_was_blank = line_is_blank;
     }
 }
 

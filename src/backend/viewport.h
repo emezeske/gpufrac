@@ -9,6 +9,8 @@ struct Viewport
 
     void do_one_step( float step_time );
 
+    void scale_extents( const Vector2Df& scale );
+
     void set_desired_pan_velocity( const Vector2Df& desired_pan_velocity );
     void set_desired_zoom_velocity( const float desired_zoom_velocity );
 
