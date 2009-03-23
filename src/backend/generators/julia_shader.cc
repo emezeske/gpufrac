@@ -22,6 +22,11 @@ const std::map<PaletteMode, cstring> palette_modes = boost::assign::map_list_of
     ( PM_TRIG,      "PALETTE_MODE_TRIG" )
     ( PM_MAGNITUDE, "PALETTE_MODE_MAGNITUDE" );
 
+const std::map<MultisamplingMode, cstring> multisampling_modes = boost::assign::map_list_of
+    ( MS_NONE, "MULTISAMPLING_NONE" )
+    ( MS_4X,   "MULTISAMPLING_4X" )
+    ( MS_8X,   "MULTISAMPLING_8X" );
+
 template <typename enum_type>
 cstring map_lookup( const std::map<enum_type, cstring>& m, const enum_type e )
 {
@@ -39,8 +44,8 @@ JuliaShader::JuliaShader() :
     seed_( 0.0f, 0.0f ),
     palette_offset_( 0.0f ),
     palette_stretch_( 1.0f ),
-    color_exponent_( 1.0f ),
     julia_exponent_( 2.0f ),
+    height_scale_( 1.0f ),
     red_phase_( 0.0f ),
     blue_phase_( 0.0f ),
     green_phase_( 0.0f ),
@@ -51,19 +56,13 @@ JuliaShader::JuliaShader() :
     blue_frequency_( 1.0f ),
     green_frequency_( 1.0f ),
     max_iterations_( 128 ),
-    multisampling_enabled_( false ),
     normal_mapping_enabled_( false ),
     arbitrary_exponent_enabled_( false ),
     coloring_method_( CM_CONTINUOUS ),
     escape_condition_( EC_CIRCLE ),
-    palette_mode_( PM_TRIG )
+    palette_mode_( PM_TRIG ),
+    multisampling_mode_( MS_NONE )
 {
-    load_shader_program();
-}
-
-void JuliaShader::set_multisampling_enabled( const bool multisampling_enabled )
-{
-    multisampling_enabled_ = multisampling_enabled;
     load_shader_program();
 }
 
@@ -97,6 +96,12 @@ void JuliaShader::set_palette_mode( const PaletteMode palette_mode )
     load_shader_program();
 }
 
+void JuliaShader::set_multisampling_mode( const MultisamplingMode multisampling_mode )
+{
+    multisampling_mode_ = multisampling_mode;
+    load_shader_program();
+}
+
 void JuliaShader::set_palette_texture( const ByteVector& image_data, const unsigned width, const unsigned height )
 {
     if ( image_data.size() < width * height * 3 ) throw std::length_error( "image_data is too short for width and height" );
@@ -118,13 +123,10 @@ void JuliaShader::load_shader_program()
     dictionary.ShowSection( map_lookup( escape_conditions, escape_condition_ ) );
     dictionary.ShowSection( map_lookup( coloring_methods, coloring_method_ ) );
     dictionary.ShowSection( map_lookup( palette_modes, palette_mode_ ) );
+    dictionary.ShowSection( map_lookup( multisampling_modes, multisampling_mode_ ) );
 
-    if ( multisampling_enabled_ )
-    {
-        dictionary.ShowSection( "MULTISAMPLING_ENABLED" );
-        // At the moment, normal mapping requires multisampling to be enabled.
-        if ( normal_mapping_enabled_ ) dictionary.ShowSection( "NORMAL_MAPPING_ENABLED" );
-    }
+    if ( normal_mapping_enabled_ ) dictionary.ShowSection( "NORMAL_MAPPING_ENABLED" );
+    else dictionary.ShowSection( "NORMAL_MAPPING_DISABLED" );
 
     if ( arbitrary_exponent_enabled_ ) dictionary.ShowSection( "ITERATOR_POLAR" );
     else dictionary.ShowSection( "ITERATOR_CARTESIAN" );
@@ -138,9 +140,9 @@ void JuliaShader::set_uniform_variables( const float pixel_width )
     shader_.set_uniform_int( "max_iterations", max_iterations_ );
     shader_.set_uniform_float( "palette_offset", palette_offset_ );
     shader_.set_uniform_float( "palette_stretch", palette_stretch_ );
-    shader_.set_uniform_float( "pixel_width", pixel_width );
-    shader_.set_uniform_float( "color_exponent", color_exponent_ );
     shader_.set_uniform_float( "julia_exponent", julia_exponent_ );
+    shader_.set_uniform_float( "height_scale", height_scale_ );
+    shader_.set_uniform_float( "pixel_width", pixel_width );
 
     shader_.set_uniform_float( "red_phase", red_phase_ );
     shader_.set_uniform_float( "blue_phase", blue_phase_ );

@@ -20,6 +20,12 @@ ESCAPE_CONDITIONS = {
     'Square' : afepy.EscapeCondition.EC_BOX
 }
 
+MULTISAMPLING_MODES = {
+    'None' : afepy.MultisamplingMode.MS_NONE,
+    '4X'   : afepy.MultisamplingMode.MS_4X,
+    '8X'   : afepy.MultisamplingMode.MS_8X
+}
+
 UPDATE_INTERVAL_MS = 10
 
 def get_image_for_opengl( filename ):
@@ -31,14 +37,14 @@ def get_image_for_opengl( filename ):
         data.append( chr( pixel[2] ) )
     return ( data, image.size[0], image.size[1] )
 
-def slider_to_scaling_factor( slider_value, neutral, max_scaling ):
+def slider_to_scaling_factor( slider_value, neutral = 50, max_scaling = 25.0, min_scaling = 25.0 ):
     """ 
-        Returns a value v such that ( 1 / max_scaling ) < v < max_scaling.
+        Returns a value v such that ( 1 / min_scaling ) < v < max_scaling.
         The neutral position is the slider value that corresponds with 1.0.
     """
     scaling = float( slider_value )
     if scaling < neutral:
-        scaling = 1.0 / ( ( ( neutral - scaling ) / neutral ) * max_scaling )
+        scaling = 1.0 / ( ( ( neutral - scaling ) / neutral ) * min_scaling )
     else:
         scaling = 1.0 + ( ( scaling - neutral ) / neutral ) * max_scaling
     return scaling
@@ -75,14 +81,13 @@ class GeneralSettings( object ):
         seed = self.generator.get_seed()
         self.set_seed_text_ctrl( seed.x, seed.y )
 
-        self.multisampling_checkbox = xrc.XRCCTRL( parent, 'multisampling' )
-
         parent.Bind( wx.EVT_TEXT_ENTER, self.on_seed_real, id=xrc.XRCID( 'seed_real' ) )
         parent.Bind( wx.EVT_TEXT_ENTER, self.on_seed_imag, id=xrc.XRCID( 'seed_imag' ) )
-        parent.Bind( wx.EVT_CHECKBOX, self.on_multisampling, id=xrc.XRCID( 'multisampling' ) )
-        parent.Bind( wx.EVT_CHECKBOX, self.on_normal_mapping, id=xrc.XRCID( 'normal_mapping' ) )
         parent.Bind( wx.EVT_CHOICE, self.on_coloring_method, id=xrc.XRCID( 'coloring_method' ) )
         parent.Bind( wx.EVT_CHOICE, self.on_escape_condition, id=xrc.XRCID( 'escape_condition' ) )
+        parent.Bind( wx.EVT_CHOICE, self.on_multisampling, id=xrc.XRCID( 'multisampling_mode' ) )
+        parent.Bind( wx.EVT_CHECKBOX, self.on_normal_mapping, id=xrc.XRCID( 'normal_mapping' ) )
+        parent.Bind( wx.EVT_SLIDER, self.on_height_scale, id=xrc.XRCID( 'height_scale' ) )
         parent.Bind( wx.EVT_SLIDER, self.on_max_iterations, id=xrc.XRCID( 'max_iterations' ) )
         parent.Bind( wx.EVT_CHECKBOX, self.on_enable_arbitrary_exponent, id=xrc.XRCID( 'enable_arbitrary_exponent' ) )
         parent.Bind( wx.EVT_SLIDER, self.on_julia_exponent, id=xrc.XRCID( 'julia_exponent' ) )
@@ -105,21 +110,20 @@ class GeneralSettings( object ):
         except ValueError: pass
         else: self.generator.set_seed( seed )
 
-    def on_multisampling( self, event ):
-        self.generator.set_multisampling_enabled( event.IsChecked() )
-
-    def on_normal_mapping( self, event ):
-        if event.IsChecked():
-            # Multisampling is required for normal mapping to work.
-            self.multisampling_checkbox.SetValue( True )
-            self.generator.set_multisampling_enabled( True )
-        self.generator.set_normal_mapping_enabled( event.IsChecked() )
-
     def on_coloring_method( self, event ):
         self.generator.set_coloring_method( COLORING_METHODS.get( event.GetString() ) )
 
     def on_escape_condition( self, event ):
         self.generator.set_escape_condition( ESCAPE_CONDITIONS.get( event.GetString() ) )
+
+    def on_multisampling( self, event ):
+        self.generator.set_multisampling_mode( MULTISAMPLING_MODES.get( event.GetString() ) )
+
+    def on_normal_mapping( self, event ):
+        self.generator.set_normal_mapping_enabled( event.IsChecked() )
+
+    def on_height_scale( self, event ):
+        self.generator.set_height_scale( slider_to_scaling_factor( event.GetInt(), min_scaling = 100.0, max_scaling = 10.0 ) )
 
     def on_max_iterations( self, event ):
         self.generator.set_max_iterations( event.GetInt() )
@@ -152,7 +156,7 @@ class TrigPaletteSlider( object ):
         if self.setting in ( 'phase', 'amplitude' ):
             return slider_value / 100.0
         elif self.setting == 'frequency':
-            return slider_to_scaling_factor( slider_value, 50, 25.0 )
+            return slider_to_scaling_factor( slider_value )
     
 class TrigPaletteSettings( object ):
     def __init__( self, parent, generator ):
@@ -183,7 +187,7 @@ class PaletteSettings( object ):
         self.cycle_speed = event.GetInt()
 
     def on_palette_stretch( self, event ):
-        self.generator.set_palette_stretch( slider_to_scaling_factor( event.GetInt(), 50, 25.0 ) )
+        self.generator.set_palette_stretch( slider_to_scaling_factor( event.GetInt() ) )
 
     def on_palette_mode_texture( self, event ):
         self.generator.set_palette_mode( afepy.PaletteMode.PM_TEXTURE )

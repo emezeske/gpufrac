@@ -3,9 +3,9 @@ uniform sampler2D palette;
 uniform int max_iterations;
 uniform float palette_offset;
 uniform float palette_stretch;
-uniform float pixel_width;
-uniform float color_exponent;
 uniform float julia_exponent;
+uniform float height_scale;
+uniform float pixel_width;
 uniform float red_phase;
 uniform float blue_phase;
 uniform float green_phase;
@@ -62,8 +62,6 @@ float calculate_escape_magnitude( vec2 z )
 
     {{#COLORING_METHOD_ITERATIVE}}
         escape_magnitude = float( iteration );
-        // escape_magnitude = float( iteration ) / float( max_iterations );
-        // escape_magnitude = 2 * pow( 1 - ( float( iteration ) / float( max_iterations ) ), color_exponent );
     {{/COLORING_METHOD_ITERATIVE}}
 
     {{#COLORING_METHOD_RADIUS_SQUARED}}
@@ -77,7 +75,7 @@ float calculate_escape_magnitude( vec2 z )
     return escape_magnitude;
 }
 
-vec3 get_color( float escape_magnitude )
+vec3 palette_lookup( float escape_magnitude )
 {
     escape_magnitude *= palette_stretch;
     escape_magnitude += palette_offset; // TODO Stretch offset?
@@ -100,38 +98,86 @@ vec3 get_color( float escape_magnitude )
     {{/PALETTE_MODE_MAGNITUDE}}
 }
 
-void main ()
+{{#NORMAL_MAPPING_DISABLED}}
+vec3 get_color( vec2 z )
 {
-    float half_pixel = pixel_width / 2.0;
+    return palette_lookup( calculate_escape_magnitude( z ) );
+}
+{{/NORMAL_MAPPING_DISABLED}}
 
-    vec2 z_a = gl_TexCoord[0].st;
-    float escape_magnitude_a = calculate_escape_magnitude( z_a );
-    vec3 base_color = get_color( escape_magnitude_a );
+{{#NORMAL_MAPPING_ENABLED}}
+vec3 get_color( vec2 z_a )
+{
+    //
+    // TODO: These calculations could be simplified if we assume the light vector is always going to be (0,0,1).
+    //
 
-    {{#MULTISAMPLING_ENABLED}}
+    float offset = pixel_width / 2.0;
+
+    vec2
+        z_b = vec2( z_a.x + offset, z_a.y ),
+        z_c = vec2( z_a.x, z_a.y + offset );
+    
+    float
+        escape_magnitude_a = calculate_escape_magnitude( z_a ),
+        escape_magnitude_b = calculate_escape_magnitude( z_b ),
+        escape_magnitude_c = calculate_escape_magnitude( z_c );
+    
+    vec3 base_color = palette_lookup( escape_magnitude_a ) + 
+                      palette_lookup( escape_magnitude_b ) + 
+                      palette_lookup( escape_magnitude_c );
+
+    base_color /= 3.0;
+    
+    vec3
+        point_a = vec3( z_a.x, z_a.y, escape_magnitude_a * height_scale ),
+        point_b = vec3( z_b.x, z_b.y, escape_magnitude_b * height_scale ),
+        point_c = vec3( z_c.x, z_c.y, escape_magnitude_c * height_scale );
+    
+    vec3 normal = normalize( cross( point_b - point_a, point_c - point_a ) );
+
+    // Multiply the color by the cosine of the angle between the face's normal and the light vector.
+    return base_color * dot( normal, vec3( 0.0, 0.0, 1.00 ) );
+}
+{{/NORMAL_MAPPING_ENABLED}}
+
+vec3 get_color_multisample_4x( vec2 z_a )
+{
+    // 4X rotated grid samples:
+    //  -  -  B  -
+    //  A  -  -  -
+    //  -  -  -  C
+    //  -  D  -  -
+    
+    float quarter_pixel = pixel_width / 4.0;
+    
+    vec2
+        z_b = vec2( z_a.x + 2.0 * quarter_pixel, z_a.y - quarter_pixel ),
+        z_c = vec2( z_a.x + 3.0 * quarter_pixel, z_a.y + quarter_pixel ),
+        z_d = vec2( z_a.x + quarter_pixel, z_a.y + 2.0 * quarter_pixel );
+    
+    vec3 color = get_color( z_a ) + get_color( z_b ) + get_color( z_c ) + get_color( z_d );
+    return color / 4.0;
+}
+
+void main()
+{
+    {{#MULTISAMPLING_NONE}}
+        vec3 pixel_color = get_color( gl_TexCoord[0].st );
+    {{/MULTISAMPLING_NONE}}
+
+    {{#MULTISAMPLING_4X}}
+        vec3 pixel_color = get_color_multisample_4x( gl_TexCoord[0].st );
+    {{/MULTISAMPLING_4X}}
+
+    {{#MULTISAMPLING_8X}}
+        float eighth_pixel = pixel_width / 8.0;
         vec2
-            z_b = vec2( z_a.x + half_pixel, z_a.y ),
-            z_c = vec2( z_a.x, z_a.y + half_pixel );
+            z_a = gl_TexCoord[0].st,
+            z_b = vec2( z_a.x + eighth_pixel, z_a.y + eighth_pixel ); 
+        vec3 pixel_color = get_color_multisample_4x( z_a ) + get_color_multisample_4x( z_b );
+        pixel_color /= 2.0;
+    {{/MULTISAMPLING_8X}}
 
-        float
-            escape_magnitude_b = calculate_escape_magnitude( z_b ),
-            escape_magnitude_c = calculate_escape_magnitude( z_c );
-
-        base_color += ( get_color( escape_magnitude_b ) + get_color( escape_magnitude_c ) );
-        base_color /= 3.0;
-
-        {{#NORMAL_MAPPING_ENABLED}}
-            vec3
-                point_a = vec3( z_a.x, z_a.y, float( escape_magnitude_a ) ),
-                point_b = vec3( z_b.x, z_b.y, float( escape_magnitude_b ) ),
-                point_c = vec3( z_c.x, z_c.y, float( escape_magnitude_c ) );
-
-            vec3 normal = normalize( cross( point_b - point_a, point_c - point_a ) );
-            // Multiply the color by the cosine of the angle between the face's normal and the light vector.
-            base_color *= dot( normal, normalize( vec3( 0.0, 0.0, 1.00 ) ) );
-        {{/NORMAL_MAPPING_ENABLED}}
-
-    {{/MULTISAMPLING_ENABLED}}
-
-    gl_FragColor = vec4( base_color, 1.0 );
+    gl_FragColor = vec4( pixel_color, 1.0 );
 }
