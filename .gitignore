@@ -1,5 +1,6 @@
 tags
 .sconsign.dblite
 afepy.so
+screenshots
 */*/*.os
 */*/*/*.os

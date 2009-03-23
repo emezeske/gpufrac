@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import Image, wx, sys, time, numpy, random, glob, re
+import Image, wx, sys, time, numpy, random, glob, re, os
 from wx import xrc
 from wx import glcanvas
 from OpenGL.GL import *
@@ -29,12 +29,6 @@ MULTISAMPLING_MODES = {
 UPDATE_INTERVAL_MS = 10
 
 SCREENSHOT_DIR = 'screenshots'
-
-def sort_nicely( l ): 
-    """ Sort the given list in the way that humans expect. """ 
-    convert = lambda text: int( text ) if text.isdigit() else text 
-    alphanum_key = lambda key: [ convert( c ) for c in re.split( '([0-9]+)', key ) ] 
-    l.sort( key=alphanum_key ) 
 
 def get_image_for_opengl( filename ):
     image = Image.open( filename )
@@ -327,12 +321,19 @@ class AfeGlFrame( wx.Frame ):
         memory.Blit( 0, 0, x, y, context, 0, 0 )
         memory.SelectObject( wx.NullBitmap )
 
+        if os.path.exists( SCREENSHOT_DIR ):
+            if not os.path.isdir( SCREENSHOT_DIR ):
+                raise OSError( "Can't save screenshot to '%s': something is in the way." % SCREENSHOT_DIR )
+        else:
+            os.mkdir( SCREENSHOT_DIR )
+
         filename_id = 0
         existing_files = glob.glob( SCREENSHOT_DIR + '/AFE-*.png' )
         if existing_files: 
             matches = [ re.search( '([0-9]+)', file ) for file in existing_files ]
             ids = [ int( match.group(1) ) for match in matches if match ]
             if ids: filename_id = max( ids ) + 1
+
         filename = SCREENSHOT_DIR + '/AFE-%d.png' % filename_id
         print 'Saving to', filename
         bitmap.SaveFile( filename, wx.BITMAP_TYPE_PNG )
