@@ -13,3 +13,11 @@ Optimize the JuliaCpu generator, possibly by hand-assembling the tightest part o
 Would be nice to build the C++ object files in an out-of-source directory.
 
 Consider the possibility of rewriting the Shader, JuliaShader, and Viewport classes in python.
+
+Add a progressive drawing mode, so that when high quality settings are enabled the GUI is still usable.
+
+Add a slider for ambient lighting to the normal-mapping configuration.
+
+Add image-based orbit traps (possibly with supersampled traps).
+
+MAYBE: Rename the project to gpufrac and drop CPU support?

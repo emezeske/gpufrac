@@ -388,11 +388,33 @@
 						</object>
 						<object class="sizeritem">
 							<option>0</option>
-							<flag>wxALL</flag>
+							<flag>wxEXPAND</flag>
 							<border>5</border>
-							<object class="wxRadioButton" name="palette_mode_magnitude">
-								<label>Magnitude-Based Palette</label>
-								<value>0</value>
+							<object class="wxGridSizer">
+								<rows>2</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<object class="wxRadioButton" name="palette_mode_orbit_trap">
+										<label>Orbit Trap Palette</label>
+										<value>0</value>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+									<border>5</border>
+									<object class="wxFilePickerCtrl" name="orbit_trap_image_file_picker">
+										<value></value>
+										<message>Select a file</message>
+										<wildcard>*.*</wildcard>
+										<style>wxFLP_DEFAULT_STYLE</style>
+									</object>
+								</object>
 							</object>
 						</object>
 						<object class="sizeritem">

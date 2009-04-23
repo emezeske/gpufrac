@@ -1,5 +1,6 @@
 uniform vec2 seed;
 uniform sampler2D palette;
+uniform sampler2D orbit_trap;
 uniform int max_iterations;
 uniform float palette_offset;
 uniform float palette_stretch;
@@ -65,7 +66,18 @@ float calculate_escape_magnitude( vec2 z )
         {{#ITERATOR_CARTESIAN}}
             z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + use_seed;
         {{/ITERATOR_CARTESIAN}}
+
+        {{#PALETTE_MODE_ORBIT_TRAP}}
+            // FIXME: This is a hack.  Maybe it should be COLORING_METHOD_ORBIT_TRAP instead?
+            float alpha = texture2D( orbit_trap, z ).a;
+            if ( alpha > 0.01 ) return alpha;
+        {{/PALETTE_MODE_ORBIT_TRAP}}
     }
+
+    {{#PALETTE_MODE_ORBIT_TRAP}}
+        // FIXME: hack...
+        return 0.0;
+    {{/PALETTE_MODE_ORBIT_TRAP}}
 
     {{#COLORING_METHOD_ITERATIVE}}
         escape_magnitude = float( iteration );
@@ -100,9 +112,9 @@ vec3 palette_lookup( float escape_magnitude )
                      blue_amplitude * sin( blue_frequency * escape_magnitude + blue_phase ) );
     {{/PALETTE_MODE_TRIG}}
 
-    {{#PALETTE_MODE_MAGNITUDE}}
+    {{#PALETTE_MODE_ORBIT_TRAP}}
         return vec3( escape_magnitude, escape_magnitude, escape_magnitude );
-    {{/PALETTE_MODE_MAGNITUDE}}
+    {{/PALETTE_MODE_ORBIT_TRAP}}
 }
 
 {{#NORMAL_MAPPING_DISABLED}}

@@ -18,9 +18,9 @@ const std::map<EscapeCondition, cstring> escape_conditions = boost::assign::map_
     ( EC_CIRCLE, "ESCAPE_CONDITION_CIRCLE" );
 
 const std::map<PaletteMode, cstring> palette_modes = boost::assign::map_list_of
-    ( PM_TEXTURE,   "PALETTE_MODE_TEXTURE" )
-    ( PM_TRIG,      "PALETTE_MODE_TRIG" )
-    ( PM_MAGNITUDE, "PALETTE_MODE_MAGNITUDE" );
+    ( PM_TEXTURE,    "PALETTE_MODE_TEXTURE" )
+    ( PM_TRIG,       "PALETTE_MODE_TRIG" )
+    ( PM_ORBIT_TRAP, "PALETTE_MODE_ORBIT_TRAP" );
 
 const std::map<MultisamplingMode, cstring> multisampling_modes = boost::assign::map_list_of
     ( MS_NONE, "MULTISAMPLING_NONE" )
@@ -41,6 +41,7 @@ cstring map_lookup( const std::map<enum_type, cstring>& m, const enum_type e )
 
 JuliaShader::JuliaShader() :
     palette_texture_( 0 ),
+    orbit_trap_texture_( 0 ),
     seed_( 0.0f, 0.0f ),
     palette_offset_( 0.0f ),
     palette_stretch_( 1.0f ),
@@ -123,6 +124,20 @@ void JuliaShader::set_palette_texture( const ByteVector& image_data, const unsig
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, &image_data[0] );
 }
 
+void JuliaShader::set_orbit_trap_texture( const ByteVector& image_data, const unsigned width, const unsigned height )
+{
+    if ( image_data.size() < width * height * 4 ) throw std::length_error( "image_data is too short for width and height" );
+    glEnable( GL_TEXTURE_2D );
+    glGenTextures( 1, &orbit_trap_texture_ );
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glBindTexture( GL_TEXTURE_2D, orbit_trap_texture_ );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image_data[0] );
+}
+
 void JuliaShader::load_shader_program()
 {
     google::TemplateDictionary dictionary( "julia" );
@@ -168,12 +183,14 @@ void JuliaShader::set_uniform_variables( const float pixel_width )
     glBindTexture( GL_TEXTURE_2D, palette_texture_ );
     shader_.set_uniform_int( "palette", 0 );
 
+    glActiveTexture( GL_TEXTURE1 );
+    glBindTexture( GL_TEXTURE_2D, orbit_trap_texture_ );
+    shader_.set_uniform_int( "orbit_trap", 1 );
+
     // FIXME When a uniform variable that does not exist is accessed it causes the PyOpenGl stuff to freak out...
+    //       Clearing the GL error state here prevents that.  This is not ideal!
     glGetError();
 }
-
-#include <sys/time.h>
-#include <time.h>
 
 void JuliaShader::draw( const Vector2Di& screen_size, const Vector2Df& viewport_position, const Vector2Df& viewport_size )
 {
@@ -182,17 +199,9 @@ void JuliaShader::draw( const Vector2Di& screen_size, const Vector2Df& viewport_
     float pixel_width = viewport_size.x_ / static_cast<float>( screen_size.x_ ); // Assumes square pixels.
     set_uniform_variables( pixel_width );
 
-    // FIXME Just here for testing.
-    // struct timeval begin;
-    // gettimeofday( &begin, NULL );
-
     shader_.draw( screen_size, viewport_position, viewport_size );
 
     shader_.disable();
 
-    // FIXME Just here for testing.
     glFinish();
-    // struct timeval end;
-    // gettimeofday( &end, NULL );
-    // VNOTIFY( FAULT, "shader draw took %d ms.", ( end.tv_sec - begin.tv_sec ) * 1000 + ( end.tv_usec - begin.tv_usec ) / 1000 );
 }

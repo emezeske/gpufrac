@@ -30,13 +30,16 @@ UPDATE_INTERVAL_MS = 10
 
 SCREENSHOT_DIR = 'screenshots'
 
-def get_image_for_opengl( filename ):
+def get_image_for_opengl( filename, use_alpha ):
+    # This function is woefully inefficient, but gets the job done (for now).
     image = Image.open( filename )
     data = afepy.ByteVector()
+    if use_alpha and not 'A' in image.getbands(): raise RuntimeError( 'Image file does not have an alpha channel' )
     for pixel in image.getdata():
         data.append( chr( pixel[0] ) )
         data.append( chr( pixel[1] ) )
         data.append( chr( pixel[2] ) )
+        if use_alpha: data.append( chr( pixel[3] ) )
     return ( data, image.size[0], image.size[1] )
 
 def slider_to_scaling_factor( slider_value, neutral = 50, max_scaling = 25.0, min_scaling = 25.0 ):
@@ -185,7 +188,8 @@ class PaletteSettings( object ):
         parent.Bind( wx.EVT_SLIDER, self.on_palette_stretch, id=xrc.XRCID( 'palette_stretch' ) )
         parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_texture, id=xrc.XRCID( 'palette_mode_texture' ) )
         parent.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_palette_image_file_picker, id=xrc.XRCID( 'palette_image_file_picker' ) )
-        parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_magnitude, id=xrc.XRCID( 'palette_mode_magnitude' ) )
+        parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_orbit_trap, id=xrc.XRCID( 'palette_mode_orbit_trap' ) )
+        parent.Bind( wx.EVT_FILEPICKER_CHANGED, self.on_palette_orbit_trap_file_picker, id=xrc.XRCID( 'orbit_trap_image_file_picker' ) )
         parent.Bind( wx.EVT_RADIOBUTTON, self.on_palette_mode_trig, id=xrc.XRCID( 'palette_mode_trig' ) )
         self.trig_settings = TrigPaletteSettings( parent, self.generator )
 
@@ -200,11 +204,16 @@ class PaletteSettings( object ):
 
     def on_palette_image_file_picker( self, event ):
         self.prepare_gl()
-        data, width, height = get_image_for_opengl( event.GetPath() )
+        data, width, height = get_image_for_opengl( event.GetPath(), False )
         self.generator.set_palette_texture( data, width, height )
 
-    def on_palette_mode_magnitude( self, event ):
-        self.generator.set_palette_mode( afepy.PaletteMode.PM_MAGNITUDE )
+    def on_palette_mode_orbit_trap( self, event ):
+        self.generator.set_palette_mode( afepy.PaletteMode.PM_ORBIT_TRAP )
+
+    def on_palette_orbit_trap_file_picker( self, event ):
+        self.prepare_gl()
+        data, width, height = get_image_for_opengl( event.GetPath(), True )
+        self.generator.set_orbit_trap_texture( data, width, height )
 
     def on_palette_mode_trig( self, event ):
         self.generator.set_palette_mode( afepy.PaletteMode.PM_TRIG )

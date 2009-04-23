@@ -25,9 +25,9 @@ BOOST_PYTHON_MODULE(afepy)
         .value( "EC_BOX",    EC_BOX );
 
     py::enum_<PaletteMode>( "PaletteMode" )
-        .value( "PM_TEXTURE",   PM_TEXTURE )
-        .value( "PM_TRIG",      PM_TRIG )
-        .value( "PM_MAGNITUDE", PM_MAGNITUDE );
+        .value( "PM_TEXTURE",    PM_TEXTURE )
+        .value( "PM_TRIG",       PM_TRIG )
+        .value( "PM_ORBIT_TRAP", PM_ORBIT_TRAP );
 
     py::enum_<MultisamplingMode>( "MultisamplingMode" )
         .value( "MS_NONE", MS_NONE )
@@ -49,6 +49,7 @@ BOOST_PYTHON_MODULE(afepy)
         .def( "set_escape_condition",           &JuliaShader::set_escape_condition )
         .def( "set_palette_mode",               &JuliaShader::set_palette_mode )
         .def( "set_palette_texture",            &JuliaShader::set_palette_texture )
+        .def( "set_orbit_trap_texture",         &JuliaShader::set_orbit_trap_texture )
         .def( "set_multisampling_mode",         &JuliaShader::set_multisampling_mode )
         .def( "set_red_phase",                  &JuliaShader::set_red_phase )
         .def( "set_green_phase",                &JuliaShader::set_green_phase )

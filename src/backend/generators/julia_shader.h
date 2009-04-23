@@ -25,7 +25,7 @@ enum PaletteMode
 {
     PM_TEXTURE,
     PM_TRIG,
-    PM_MAGNITUDE
+    PM_ORBIT_TRAP
 };
 
 enum MultisamplingMode
@@ -55,6 +55,7 @@ struct JuliaShader
     void set_palette_mode( const PaletteMode palette_mode );
     void set_multisampling_mode( const MultisamplingMode multisampling_mode );
     void set_palette_texture( const ByteVector& image_data, const unsigned width, const unsigned height );
+    void set_orbit_trap_texture( const ByteVector& image_data, const unsigned width, const unsigned height );
     void set_red_phase( const float red_phase ) { red_phase_ = red_phase; }
     void set_green_phase( const float green_phase ) { green_phase_ = green_phase; }
     void set_blue_phase( const float blue_phase ) { blue_phase_ = blue_phase; }
@@ -71,7 +72,9 @@ struct JuliaShader
 private:
     Shader shader_;
 
-    GLuint palette_texture_;
+    GLuint
+        palette_texture_,
+        orbit_trap_texture_;
 
     Vector2Df seed_;
 
