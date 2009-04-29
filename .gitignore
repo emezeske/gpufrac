@@ -1,6 +1,6 @@
 tags
 .sconsign.dblite
-afepy.so
+gpufrac.so
+screenshots
 screenshots
 */*/*.os
-*/*/*/*.os

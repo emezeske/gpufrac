@@ -7,7 +7,7 @@
 
 typedef std::vector<char> ByteVector;
 
-enum ColoringMethod
+enum ColoringMode
 {
     CM_ITERATIVE,
     CM_CONTINUOUS,
@@ -50,7 +50,7 @@ struct FractalShader
     void set_mandelbrot_mode_enabled( const bool mandelbrot_mode_enabled );
     void set_normal_mapping_enabled( const bool normal_mapping_enabled );
     void set_arbitrary_exponent_enabled( const bool arbitrary_exponent_enabled );
-    void set_coloring_method( const ColoringMethod coloring_method );
+    void set_coloring_mode( const ColoringMode coloring_mode );
     void set_escape_condition( const EscapeCondition escape_condition );
     void set_palette_mode( const PaletteMode palette_mode );
     void set_multisampling_mode( const MultisamplingMode multisampling_mode );
@@ -100,7 +100,7 @@ private:
         normal_mapping_enabled_,
         arbitrary_exponent_enabled_;
     
-    ColoringMethod coloring_method_;
+    ColoringMode coloring_mode_;
     EscapeCondition escape_condition_;
     PaletteMode palette_mode_;
     MultisamplingMode multisampling_mode_;

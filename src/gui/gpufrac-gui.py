@@ -8,11 +8,11 @@ from OpenGL.GL import *
 sys.path.append( './' )
 import gpufrac
 
-COLORING_METHODS = {
-    'Continuous'     : gpufrac.ColoringMethod.CM_CONTINUOUS,
-    'Stepped'        : gpufrac.ColoringMethod.CM_ITERATIVE,
-    'Radius Squared' : gpufrac.ColoringMethod.CM_RADIUS_SQUARED,
-    'Angle'          : gpufrac.ColoringMethod.CM_ANGLE
+COLORING_MODES = {
+    'Continuous'     : gpufrac.ColoringMode.CM_CONTINUOUS,
+    'Stepped'        : gpufrac.ColoringMode.CM_ITERATIVE,
+    'Radius Squared' : gpufrac.ColoringMode.CM_RADIUS_SQUARED,
+    'Angle'          : gpufrac.ColoringMode.CM_ANGLE
 }
 
 ESCAPE_CONDITIONS = {
@@ -31,15 +31,18 @@ UPDATE_INTERVAL_MS = 10
 SCREENSHOT_DIR = 'screenshots'
 
 def get_image_for_opengl( filename, use_alpha ):
-    # This function is woefully inefficient, but gets the job done (for now).
+    # The efficiency of this function has become a bit of a problem with large (1024x1024+) orbit traps.
+    # Figure out a way to optimise it in Python, or just move it into libgpufrac.
     image = Image.open( filename )
     data = gpufrac.ByteVector()
-    if use_alpha and not 'A' in image.getbands(): raise RuntimeError( 'Image file does not have an alpha channel' )
+    if use_alpha and not 'A' in image.getbands():
+        raise RuntimeError( 'Image file does not have an alpha channel' )
     for pixel in image.getdata():
         data.append( chr( pixel[0] ) )
         data.append( chr( pixel[1] ) )
         data.append( chr( pixel[2] ) )
-        if use_alpha: data.append( chr( pixel[3] ) )
+        if use_alpha:
+            data.append( chr( pixel[3] ) )
     return ( data, image.size[0], image.size[1] )
 
 def slider_to_scaling_factor( slider_value, neutral = 50, max_scaling = 25.0, min_scaling = 25.0 ):
@@ -64,7 +67,7 @@ class GeneralSettings( object ):
 
         parent.Bind( wx.EVT_TEXT_ENTER, self.on_seed_real, id=xrc.XRCID( 'seed_real' ) )
         parent.Bind( wx.EVT_TEXT_ENTER, self.on_seed_imag, id=xrc.XRCID( 'seed_imag' ) )
-        parent.Bind( wx.EVT_CHOICE, self.on_coloring_method, id=xrc.XRCID( 'coloring_method' ) )
+        parent.Bind( wx.EVT_CHOICE, self.on_coloring_mode, id=xrc.XRCID( 'coloring_mode' ) )
         parent.Bind( wx.EVT_CHOICE, self.on_escape_condition, id=xrc.XRCID( 'escape_condition' ) )
         parent.Bind( wx.EVT_CHOICE, self.on_multisampling, id=xrc.XRCID( 'multisampling_mode' ) )
         parent.Bind( wx.EVT_CHECKBOX, self.on_mandelbrot_mode, id=xrc.XRCID( 'mandelbrot_mode' ) )
@@ -92,8 +95,8 @@ class GeneralSettings( object ):
         except ValueError: pass
         else: self.generator.set_seed( seed )
 
-    def on_coloring_method( self, event ):
-        self.generator.set_coloring_method( COLORING_METHODS.get( event.GetString() ) )
+    def on_coloring_mode( self, event ):
+        self.generator.set_coloring_mode( COLORING_MODES.get( event.GetString() ) )
 
     def on_escape_condition( self, event ):
         self.generator.set_escape_condition( ESCAPE_CONDITIONS.get( event.GetString() ) )
@@ -217,9 +220,9 @@ class FractalShaderGenerator( object ):
             self.generator.set_seed( gpufrac.Vector2Df( real, imag ) )
             event.Skip()
        
-class AfeGlFrame( wx.Frame ):
+class FractalFrame( wx.Frame ):
     def __init__( self, pos, size ):
-        super( AfeGlFrame, self ).__init__( None, -1, 'gpufrac', pos, size, wx.DEFAULT_FRAME_STYLE, 'gpufrac' )
+        super( FractalFrame, self ).__init__( None, -1, 'gpufrac', pos, size, wx.DEFAULT_FRAME_STYLE, 'gpufrac' )
         self.xml_resource = xrc.XmlResource( 'src/gui/gpufrac-gui.xrc' )
         attributes = ( glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER )
         self.canvas = glcanvas.GLCanvas( self, attribList=attributes )
@@ -327,6 +330,9 @@ class AfeGlFrame( wx.Frame ):
         print 'Saving to', filename
         bitmap.SaveFile( filename, wx.BITMAP_TYPE_PNG )
 
+    # FIXME: Hmm, ever since I upgraded to Kubuntu 9.04 (Jaunty Jackelope) the pan/zoom velocity stuff has
+    #        has been weirdly broken.  I think maybe it has something to do with key repeat...?
+
     def update_pan_velocity( self ):
         pan_velocity = gpufrac.Vector2Df( 0.0, 0.0 )
         if self.depressed_keys.get( 'D' ): pan_velocity.x += 1.0
@@ -339,7 +345,6 @@ class AfeGlFrame( wx.Frame ):
         zoom_velocity = 0.0
         if self.depressed_keys.get( 'E' ): zoom_velocity += 1.0
         if self.depressed_keys.get( 'Q' ): zoom_velocity -= 1.0
-        # FIXME: Zooming in has somehow become broken...
         self.viewport.set_desired_zoom_velocity( zoom_velocity )
 
     def remember_window_size( self ):
@@ -369,7 +374,7 @@ def exception_hook( type, value, traceback ):
 sys.excepthook = exception_hook
 
 app = wx.App()
-frame = AfeGlFrame( wx.DefaultPosition, (512, 512) )
+frame = FractalFrame( wx.DefaultPosition, (512, 512) )
 frame.Show()
 
 app.MainLoop()

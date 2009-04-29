@@ -17,82 +17,12 @@ uniform float red_frequency;
 uniform float blue_frequency;
 uniform float green_frequency;
 
-float calculate_escape_magnitude( vec2 z )
+// TODO: Desperately must come up with a better name than 'info'...
+struct escape_info
 {
-    float 
-        escape_magnitude = 0.0,
-        half_julia_exponent = julia_exponent / 2.0;
-
-    int iteration = 0;
-
-    float radius_squared = 0.0;
-
-    {{#MANDELBROT_MODE_ENABLED}}
-        vec2 use_seed = z; // TODO: Better name?
-    {{/MANDELBROT_MODE_ENABLED}}
-
-    {{#MANDELBROT_MODE_DISABLED}}
-        vec2 use_seed = seed;
-    {{/MANDELBROT_MODE_DISABLED}}
-
-    for ( ; iteration < max_iterations; ++iteration )
-    {
-        float
-            z_x_squared = z.x * z.x,
-            z_y_squared = z.y * z.y;
-
-        radius_squared = z_x_squared + z_y_squared;
-
-        {{#COLORING_METHOD_CONTINUOUS}}
-            escape_magnitude += exp( -sqrt( radius_squared ) ); // e ^( -radius )
-        {{/COLORING_METHOD_CONTINUOUS}}
-
-        {{#ESCAPE_CONDITION_CIRCLE}}
-            if ( radius_squared > 4.0 ) break;      
-        {{/ESCAPE_CONDITION_CIRCLE}}
-
-        {{#ESCAPE_CONDITION_BOX}}
-            if ( z.x > 2.0 && z.y > 2.0 ) break;
-        {{/ESCAPE_CONDITION_BOX}}
-
-        {{#ITERATOR_POLAR}}
-            float 
-                new_theta = julia_exponent * atan( z.y, z.x ),
-                new_radius = pow( radius_squared, half_julia_exponent );
-
-            z = vec2( new_radius * cos( new_theta ), new_radius * sin( new_theta ) ) + use_seed;
-        {{/ITERATOR_POLAR}}
-
-        {{#ITERATOR_CARTESIAN}}
-            z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + use_seed;
-        {{/ITERATOR_CARTESIAN}}
-
-        {{#PALETTE_MODE_ORBIT_TRAP}}
-            // FIXME: This is a hack.  Maybe it should be COLORING_METHOD_ORBIT_TRAP instead?
-            float alpha = texture2D( orbit_trap, z ).a;
-            if ( alpha > 0.01 ) return alpha;
-        {{/PALETTE_MODE_ORBIT_TRAP}}
-    }
-
-    {{#PALETTE_MODE_ORBIT_TRAP}}
-        // FIXME: hack...
-        return 0.0;
-    {{/PALETTE_MODE_ORBIT_TRAP}}
-
-    {{#COLORING_METHOD_ITERATIVE}}
-        escape_magnitude = float( iteration );
-    {{/COLORING_METHOD_ITERATIVE}}
-
-    {{#COLORING_METHOD_RADIUS_SQUARED}}
-        escape_magnitude = radius_squared;
-    {{/COLORING_METHOD_RADIUS_SQUARED}}
-
-    {{#COLORING_METHOD_ANGLE}}
-        escape_magnitude = atan( z.y, z.x );
-    {{/COLORING_METHOD_ANGLE}}
-
-    return escape_magnitude;
-}
+    float magnitude;
+    vec3 color;
+};
 
 vec3 palette_lookup( float escape_magnitude )
 {
@@ -117,10 +47,108 @@ vec3 palette_lookup( float escape_magnitude )
     {{/PALETTE_MODE_ORBIT_TRAP}}
 }
 
+escape_info calculate_escape_info( vec2 z )
+{
+    escape_info info;
+
+    info.magnitude = 0.0;
+    info.color = vec3( 0.0, 0.0, 0.0 );
+
+    float 
+        escape_magnitude = 0.0,
+        half_julia_exponent = julia_exponent / 2.0;
+
+    int iteration = 0;
+
+    float radius_squared = 0.0;
+
+    {{#MANDELBROT_MODE_ENABLED}}
+        vec2 use_seed = z; // TODO: Better name?
+    {{/MANDELBROT_MODE_ENABLED}}
+
+    {{#MANDELBROT_MODE_DISABLED}}
+        vec2 use_seed = seed;
+    {{/MANDELBROT_MODE_DISABLED}}
+
+    for ( ; iteration < max_iterations; ++iteration )
+    {
+        float
+            z_x_squared = z.x * z.x,
+            z_y_squared = z.y * z.y;
+
+        radius_squared = z_x_squared + z_y_squared;
+
+        {{#COLORING_MODE_CONTINUOUS}}
+            info.magnitude += exp( -sqrt( radius_squared ) ); // e ^ ( -radius )
+        {{/COLORING_MODE_CONTINUOUS}}
+
+        {{#ESCAPE_CONDITION_CIRCLE}}
+            if ( radius_squared > 4.0 ) break;      
+        {{/ESCAPE_CONDITION_CIRCLE}}
+
+        {{#ESCAPE_CONDITION_BOX}}
+            if ( z.x > 2.0 && z.y > 2.0 ) break;
+        {{/ESCAPE_CONDITION_BOX}}
+
+        {{#ITERATOR_POLAR}}
+            float 
+                new_theta = julia_exponent * atan( z.y, z.x ),
+                new_radius = pow( radius_squared, half_julia_exponent );
+
+            z = vec2( new_radius * cos( new_theta ), new_radius * sin( new_theta ) ) + use_seed;
+        {{/ITERATOR_POLAR}}
+
+        {{#ITERATOR_CARTESIAN}}
+            z = vec2( z_x_squared - z_y_squared, 2.0 * z.x * z.y ) + use_seed;
+        {{/ITERATOR_CARTESIAN}}
+
+        {{#PALETTE_MODE_ORBIT_TRAP}}
+            // FIXME: Ugly hack, just for now.
+            vec4 trap_color = texture2D( orbit_trap, z );
+            if ( trap_color.a > 0.01 )
+            {
+                // Currently the alpha channel of the orbit trap is used as the magnitude.  This is for no good reason, except for a
+                // general lack of anything else to assign to it.  TODO: Come up with a reasonable meaning for 'magnitude' in orbit trap mode.
+                info.magnitude = trap_color.a;
+                info.color = trap_color.rgb * trap_color.a;
+                return info;
+            }
+        {{/PALETTE_MODE_ORBIT_TRAP}}
+    }
+
+    {{#PALETTE_MODE_ORBIT_TRAP}}
+        // FIXME: Ugly hack, just for now.
+        info.magnitude = 0.0;
+        return info;
+    {{/PALETTE_MODE_ORBIT_TRAP}}
+
+    {{#COLORING_MODE_CONTINUOUS}}
+        // TODO remove duplicated info.color = ... etc.
+        info.color = palette_lookup( info.magnitude );
+    {{/COLORING_MODE_CONTINUOUS}}
+
+    {{#COLORING_MODE_ITERATIVE}}
+        info.magnitude = float( iteration );
+        info.color = palette_lookup( info.magnitude );
+    {{/COLORING_MODE_ITERATIVE}}
+
+    {{#COLORING_MODE_RADIUS_SQUARED}}
+        info.magnitude = radius_squared;
+        info.color = palette_lookup( info.magnitude );
+    {{/COLORING_MODE_RADIUS_SQUARED}}
+
+    {{#COLORING_MODE_ANGLE}}
+        info.magnitude = atan( z.y, z.x );
+        info.color = palette_lookup( info.magnitude );
+    {{/COLORING_MODE_ANGLE}}
+
+    return info;
+}
+
 {{#NORMAL_MAPPING_DISABLED}}
 vec3 get_color( vec2 z )
 {
-    return palette_lookup( calculate_escape_magnitude( z ) );
+    return calculate_escape_info( z ).color;
 }
 {{/NORMAL_MAPPING_DISABLED}}
 
@@ -132,22 +160,19 @@ vec3 get_color( vec2 z_a )
     vec2
         z_b = vec2( z_a.x + offset, z_a.y ),
         z_c = vec2( z_a.x, z_a.y + offset );
-    
-    float
-        escape_magnitude_a = calculate_escape_magnitude( z_a ),
-        escape_magnitude_b = calculate_escape_magnitude( z_b ),
-        escape_magnitude_c = calculate_escape_magnitude( z_c );
-    
-    vec3 base_color = palette_lookup( escape_magnitude_a ) + 
-                      palette_lookup( escape_magnitude_b ) + 
-                      palette_lookup( escape_magnitude_c );
 
+    escape_info
+        escape_info_a = calculate_escape_info( z_a ),
+        escape_info_b = calculate_escape_info( z_b ),
+        escape_info_c = calculate_escape_info( z_c );
+    
+    vec3 base_color = escape_info_a.color + escape_info_a.color + escape_info_a.color;
     base_color /= 3.0;
     
     vec3
-        point_a = vec3( z_a.x, z_a.y, escape_magnitude_a * height_scale ),
-        point_b = vec3( z_b.x, z_b.y, escape_magnitude_b * height_scale ),
-        point_c = vec3( z_c.x, z_c.y, escape_magnitude_c * height_scale );
+        point_a = vec3( z_a.x, z_a.y, escape_info_a.magnitude * height_scale ),
+        point_b = vec3( z_b.x, z_b.y, escape_info_b.magnitude * height_scale ),
+        point_c = vec3( z_c.x, z_c.y, escape_info_c.magnitude * height_scale );
     
     vec3 normal = normalize( cross( point_b - point_a, point_c - point_a ) );
 

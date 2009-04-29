@@ -18,7 +18,7 @@
 			<style>wxNB_TOP</style>
 			<object class="notebookpage">
 				<label>General</label>
-				<selected>1</selected>
+				<selected>0</selected>
 				<object class="wxPanel" name="m_panel1">
 					<style>wxTAB_TRAVERSAL</style>
 					<object class="wxBoxSizer">
@@ -120,7 +120,7 @@
 									<option>0</option>
 									<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
-									<object class="wxChoice" name="coloring_method">
+									<object class="wxChoice" name="coloring_mode">
 										<selection>0</selection>
 										<content>
 											<item>Continuous</item>
@@ -283,7 +283,7 @@
 			</object>
 			<object class="notebookpage">
 				<label>Palette</label>
-				<selected>0</selected>
+				<selected>1</selected>
 				<object class="wxPanel" name="m_panel2">
 					<style>wxTAB_TRAVERSAL</style>
 					<object class="wxBoxSizer">
@@ -367,7 +367,7 @@
 								</object>
 								<object class="sizeritem">
 									<option>0</option>
-									<flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+									<flag>wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND</flag>
 									<border>5</border>
 									<object class="wxFilePickerCtrl" name="palette_image_file_picker">
 										<value></value>
@@ -406,7 +406,7 @@
 								</object>
 								<object class="sizeritem">
 									<option>0</option>
-									<flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+									<flag>wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND</flag>
 									<border>5</border>
 									<object class="wxFilePickerCtrl" name="orbit_trap_image_file_picker">
 										<value></value>

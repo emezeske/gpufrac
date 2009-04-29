@@ -6,16 +6,10 @@ Save videos to disk, maybe?
 
 Mousewheel zooming.
 
-Flesh out the JuliaCpu generator so that it supports the same settings as JuliaShader.
-
-Optimize the JuliaCpu generator, possibly by hand-assembling the tightest part of the loop, using SSE.
-
 Would be nice to build the C++ object files in an out-of-source directory.
 
-Consider the possibility of rewriting the Shader, JuliaShader, and Viewport classes in python.
+Consider the possibility of rewriting the Shader, FractalShader, and Viewport classes in python.
 
 Add a progressive drawing mode, so that when high quality settings are enabled the GUI is still usable.
 
 Add a slider for ambient lighting to the normal-mapping configuration.
-
-Add image-based orbit traps (possibly with supersampled traps).
