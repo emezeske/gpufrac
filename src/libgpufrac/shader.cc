@@ -4,7 +4,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-#include "backend/generators/shader.h"
+#include "shader.h"
 
 void Shader::init()
 {

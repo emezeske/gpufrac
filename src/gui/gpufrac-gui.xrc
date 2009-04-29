@@ -3,7 +3,7 @@
 	<object class="wxFrame" name="julia_shader_settings_frame">
 		<style>wxCAPTION|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL</style>
 		<size>513,580</size>
-		<title>AFE - Julia Shader Settings</title>
+		<title>gpufrac settings</title>
 		<object class="wxMenuBar" name="m_menubar2">
 			<label></label>
 			<object class="wxMenu" name="fileMenu">
@@ -702,43 +702,6 @@
 							</object>
 						</object>
 					</object>
-				</object>
-			</object>
-		</object>
-	</object>
-	<object class="wxFrame" name="julia_cpu_settings_frame">
-		<style>wxCAPTION|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL</style>
-		<size>431,129</size>
-		<title>AFE - Julia CPU Settings</title>
-		<object class="wxMenuBar" name="m_menubar2">
-			<label></label>
-			<object class="wxMenu" name="fileMenu">
-				<label>File</label>
-				<object class="wxMenuItem" name="menu_exit">
-					<label>Exit </label>
-					<help></help>
-				</object>
-			</object>
-		</object>
-		<object class="wxBoxSizer">
-			<orient>wxVERTICAL</orient>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText2">
-					<label>Max Iterations</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxSlider" name="max_iterations">
-					<style>wxSL_HORIZONTAL</style>
-					<value>64</value>
-					<min>1</min>
-					<max>512</max>
 				</object>
 			</object>
 		</object>

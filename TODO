@@ -19,5 +19,3 @@ Add a progressive drawing mode, so that when high quality settings are enabled t
 Add a slider for ambient lighting to the normal-mapping configuration.
 
 Add image-based orbit traps (possibly with supersampled traps).
-
-MAYBE: Rename the project to gpufrac and drop CPU support?

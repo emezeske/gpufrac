@@ -3,7 +3,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "backend/generators/julia_shader.h"
+#include "fractal_shader.h"
 
 namespace {
 
@@ -39,7 +39,7 @@ cstring map_lookup( const std::map<enum_type, cstring>& m, const enum_type e )
 
 } // anonymous namespace
 
-JuliaShader::JuliaShader() :
+FractalShader::FractalShader() :
     palette_texture_( 0 ),
     orbit_trap_texture_( 0 ),
     seed_( 0.0f, 0.0f ),
@@ -68,49 +68,49 @@ JuliaShader::JuliaShader() :
     load_shader_program();
 }
 
-void JuliaShader::set_mandelbrot_mode_enabled( const bool mandelbrot_mode_enabled )
+void FractalShader::set_mandelbrot_mode_enabled( const bool mandelbrot_mode_enabled )
 {
     mandelbrot_mode_enabled_ = mandelbrot_mode_enabled;
     load_shader_program();
 }
 
-void JuliaShader::set_normal_mapping_enabled( const bool normal_mapping_enabled )
+void FractalShader::set_normal_mapping_enabled( const bool normal_mapping_enabled )
 {
     normal_mapping_enabled_ = normal_mapping_enabled;
     load_shader_program();
 }
 
-void JuliaShader::set_arbitrary_exponent_enabled( const bool arbitrary_exponent_enabled )
+void FractalShader::set_arbitrary_exponent_enabled( const bool arbitrary_exponent_enabled )
 {
     arbitrary_exponent_enabled_ = arbitrary_exponent_enabled;
     load_shader_program();
 }
 
-void JuliaShader::set_coloring_method( const ColoringMethod coloring_method )
+void FractalShader::set_coloring_method( const ColoringMethod coloring_method )
 {
     coloring_method_ = coloring_method;
     load_shader_program();
 }
 
-void JuliaShader::set_escape_condition( const EscapeCondition escape_condition )
+void FractalShader::set_escape_condition( const EscapeCondition escape_condition )
 {
     escape_condition_ = escape_condition;
     load_shader_program();
 }
 
-void JuliaShader::set_palette_mode( const PaletteMode palette_mode )
+void FractalShader::set_palette_mode( const PaletteMode palette_mode )
 {
     palette_mode_ = palette_mode;
     load_shader_program();
 }
 
-void JuliaShader::set_multisampling_mode( const MultisamplingMode multisampling_mode )
+void FractalShader::set_multisampling_mode( const MultisamplingMode multisampling_mode )
 {
     multisampling_mode_ = multisampling_mode;
     load_shader_program();
 }
 
-void JuliaShader::set_palette_texture( const ByteVector& image_data, const unsigned width, const unsigned height )
+void FractalShader::set_palette_texture( const ByteVector& image_data, const unsigned width, const unsigned height )
 {
     if ( image_data.size() < width * height * 3 ) throw std::length_error( "image_data is too short for width and height" );
     glEnable( GL_TEXTURE_2D );
@@ -124,7 +124,7 @@ void JuliaShader::set_palette_texture( const ByteVector& image_data, const unsig
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, &image_data[0] );
 }
 
-void JuliaShader::set_orbit_trap_texture( const ByteVector& image_data, const unsigned width, const unsigned height )
+void FractalShader::set_orbit_trap_texture( const ByteVector& image_data, const unsigned width, const unsigned height )
 {
     if ( image_data.size() < width * height * 4 ) throw std::length_error( "image_data is too short for width and height" );
     glEnable( GL_TEXTURE_2D );
@@ -138,9 +138,9 @@ void JuliaShader::set_orbit_trap_texture( const ByteVector& image_data, const un
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image_data[0] );
 }
 
-void JuliaShader::load_shader_program()
+void FractalShader::load_shader_program()
 {
-    google::TemplateDictionary dictionary( "julia" );
+    google::TemplateDictionary dictionary( "fractal" );
 
     dictionary.ShowSection( map_lookup( escape_conditions, escape_condition_ ) );
     dictionary.ShowSection( map_lookup( coloring_methods, coloring_method_ ) );
@@ -156,10 +156,10 @@ void JuliaShader::load_shader_program()
     if ( arbitrary_exponent_enabled_ ) dictionary.ShowSection( "ITERATOR_POLAR" );
     else dictionary.ShowSection( "ITERATOR_CARTESIAN" );
 
-    shader_.load_from_template( "src/backend/generators/julia.glsl.tpl", dictionary );
+    shader_.load_from_template( "src/libgpufrac/fractal_shader.glsl.tpl", dictionary );
 }
 
-void JuliaShader::set_uniform_variables( const float pixel_width )
+void FractalShader::set_uniform_variables( const float pixel_width )
 {
     shader_.set_uniform_vec2d( "seed", seed_ );
     shader_.set_uniform_int( "max_iterations", max_iterations_ );
@@ -192,7 +192,7 @@ void JuliaShader::set_uniform_variables( const float pixel_width )
     glGetError();
 }
 
-void JuliaShader::draw( const Vector2Di& screen_size, const Vector2Df& viewport_position, const Vector2Df& viewport_size )
+void FractalShader::draw( const Vector2Di& screen_size, const Vector2Df& viewport_position, const Vector2Df& viewport_size )
 {
     shader_.enable();
 

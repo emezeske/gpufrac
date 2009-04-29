@@ -6,24 +6,24 @@ from wx import glcanvas
 from OpenGL.GL import *
 
 sys.path.append( './' )
-import afepy
+import gpufrac
 
 COLORING_METHODS = {
-    'Continuous'     : afepy.ColoringMethod.CM_CONTINUOUS,
-    'Stepped'        : afepy.ColoringMethod.CM_ITERATIVE,
-    'Radius Squared' : afepy.ColoringMethod.CM_RADIUS_SQUARED,
-    'Angle'          : afepy.ColoringMethod.CM_ANGLE
+    'Continuous'     : gpufrac.ColoringMethod.CM_CONTINUOUS,
+    'Stepped'        : gpufrac.ColoringMethod.CM_ITERATIVE,
+    'Radius Squared' : gpufrac.ColoringMethod.CM_RADIUS_SQUARED,
+    'Angle'          : gpufrac.ColoringMethod.CM_ANGLE
 }
 
 ESCAPE_CONDITIONS = {
-    'Circle' : afepy.EscapeCondition.EC_CIRCLE,
-    'Square' : afepy.EscapeCondition.EC_BOX
+    'Circle' : gpufrac.EscapeCondition.EC_CIRCLE,
+    'Square' : gpufrac.EscapeCondition.EC_BOX
 }
 
 MULTISAMPLING_MODES = {
-    'None' : afepy.MultisamplingMode.MS_NONE,
-    '4X'   : afepy.MultisamplingMode.MS_4X,
-    '8X'   : afepy.MultisamplingMode.MS_8X
+    'None' : gpufrac.MultisamplingMode.MS_NONE,
+    '4X'   : gpufrac.MultisamplingMode.MS_4X,
+    '8X'   : gpufrac.MultisamplingMode.MS_8X
 }
 
 UPDATE_INTERVAL_MS = 10
@@ -33,7 +33,7 @@ SCREENSHOT_DIR = 'screenshots'
 def get_image_for_opengl( filename, use_alpha ):
     # This function is woefully inefficient, but gets the job done (for now).
     image = Image.open( filename )
-    data = afepy.ByteVector()
+    data = gpufrac.ByteVector()
     if use_alpha and not 'A' in image.getbands(): raise RuntimeError( 'Image file does not have an alpha channel' )
     for pixel in image.getdata():
         data.append( chr( pixel[0] ) )
@@ -53,30 +53,6 @@ def slider_to_scaling_factor( slider_value, neutral = 50, max_scaling = 25.0, mi
     else:
         scaling = 1.0 + ( ( scaling - neutral ) / neutral ) * max_scaling
     return scaling
-
-class JuliaCpuGenerator( object ):
-    def __init__( self, fractal_frame, xml_resource ):
-        self.fractal_frame = fractal_frame
-        self.generator = afepy.JuliaCpu()
-        self.frame = xml_resource.LoadFrame( self.fractal_frame, 'julia_cpu_settings_frame' )
-        self.frame.Bind( wx.EVT_SLIDER, self.on_max_iterations, id=xrc.XRCID( 'max_iterations' ) )
-        self.frame.Show()
-
-    def do_one_step( self, elapsed_time ):
-        pass
-
-    def draw_fractal( self, width, height, viewport ):
-        self.generator.draw( afepy.Vector2Di( width, height ), viewport.position(), viewport.size() )
-
-    def on_max_iterations( self, event ):
-        self.generator.set_max_iterations( event.GetInt() )
-
-    def on_fractal_motion( self, event ):
-        if event.Dragging():
-            x = 2.0 * ( float( event.GetX() ) / self.fractal_frame.width() - 0.5 )
-            y = 2.0 * ( float( self.fractal_frame.height() - event.GetY() ) / self.fractal_frame.height() - 0.5 )
-            self.generator.set_seed( afepy.Vector2Df( x, y ) )
-            event.Skip()
 
 class GeneralSettings( object ):
     def __init__( self, parent, generator ):
@@ -200,7 +176,7 @@ class PaletteSettings( object ):
         self.generator.set_palette_stretch( slider_to_scaling_factor( event.GetInt() ) )
 
     def on_palette_mode_texture( self, event ):
-        self.generator.set_palette_mode( afepy.PaletteMode.PM_TEXTURE )
+        self.generator.set_palette_mode( gpufrac.PaletteMode.PM_TEXTURE )
 
     def on_palette_image_file_picker( self, event ):
         self.prepare_gl()
@@ -208,7 +184,7 @@ class PaletteSettings( object ):
         self.generator.set_palette_texture( data, width, height )
 
     def on_palette_mode_orbit_trap( self, event ):
-        self.generator.set_palette_mode( afepy.PaletteMode.PM_ORBIT_TRAP )
+        self.generator.set_palette_mode( gpufrac.PaletteMode.PM_ORBIT_TRAP )
 
     def on_palette_orbit_trap_file_picker( self, event ):
         self.prepare_gl()
@@ -216,12 +192,12 @@ class PaletteSettings( object ):
         self.generator.set_orbit_trap_texture( data, width, height )
 
     def on_palette_mode_trig( self, event ):
-        self.generator.set_palette_mode( afepy.PaletteMode.PM_TRIG )
+        self.generator.set_palette_mode( gpufrac.PaletteMode.PM_TRIG )
     
-class JuliaShaderGenerator( object ):
+class FractalShaderGenerator( object ):
     def __init__( self, fractal_frame, xml_resource ):
         self.fractal_frame = fractal_frame
-        self.generator = afepy.JuliaShader()
+        self.generator = gpufrac.FractalShader()
         self.frame = xml_resource.LoadFrame( self.fractal_frame, 'julia_shader_settings_frame' )
         self.general_settings = GeneralSettings( self.frame, self.generator )
         self.palette_settings = PaletteSettings( self.frame, self.generator, self.fractal_frame.canvas.SetCurrent )
@@ -231,24 +207,24 @@ class JuliaShaderGenerator( object ):
         self.generator.set_palette_offset( self.generator.get_palette_offset() + self.palette_settings.cycle_speed * elapsed_time )
 
     def draw_fractal( self, width, height, viewport ):
-        self.generator.draw( afepy.Vector2Di( width, height ), viewport.position(), viewport.size() )
+        self.generator.draw( gpufrac.Vector2Di( width, height ), viewport.position(), viewport.size() )
 
     def on_fractal_motion( self, event ):
         if event.Dragging():
             real = 2.0 * ( float( event.GetX() ) / self.fractal_frame.width() - 0.5 )
             imag = 2.0 * ( float( self.fractal_frame.height() - event.GetY() ) / self.fractal_frame.height() - 0.5 )
             self.general_settings.set_seed_text_ctrl( real, imag )
-            self.generator.set_seed( afepy.Vector2Df( real, imag ) )
+            self.generator.set_seed( gpufrac.Vector2Df( real, imag ) )
             event.Skip()
        
 class AfeGlFrame( wx.Frame ):
     def __init__( self, pos, size ):
-        super( AfeGlFrame, self ).__init__( None, -1, 'AFE', pos, size, wx.DEFAULT_FRAME_STYLE, 'AFE' )
-        self.xml_resource = xrc.XmlResource( 'src/gui/afe-gui.xrc' )
+        super( AfeGlFrame, self ).__init__( None, -1, 'gpufrac', pos, size, wx.DEFAULT_FRAME_STYLE, 'gpufrac' )
+        self.xml_resource = xrc.XmlResource( 'src/gui/gpufrac-gui.xrc' )
         attributes = ( glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER )
         self.canvas = glcanvas.GLCanvas( self, attribList=attributes )
         self.gl_initialized = False
-        self.viewport = afepy.Viewport( afepy.Vector2Df( -1.0, -1.0 ), afepy.Vector2Df( 2.0, 2.0 ) )
+        self.viewport = gpufrac.Viewport( gpufrac.Vector2Df( -1.0, -1.0 ), gpufrac.Vector2Df( 2.0, 2.0 ) )
         self.generator_frame = None
         self.depressed_keys = {}
         self.last_timer_event = time.time()
@@ -341,18 +317,18 @@ class AfeGlFrame( wx.Frame ):
             os.mkdir( SCREENSHOT_DIR )
 
         filename_id = 0
-        existing_files = glob.glob( SCREENSHOT_DIR + '/AFE-*.png' )
+        existing_files = glob.glob( SCREENSHOT_DIR + '/gpufrac-*.png' )
         if existing_files: 
             matches = [ re.search( '([0-9]+)', file ) for file in existing_files ]
             ids = [ int( match.group(1) ) for match in matches if match ]
             if ids: filename_id = max( ids ) + 1
 
-        filename = SCREENSHOT_DIR + '/AFE-%d.png' % filename_id
+        filename = SCREENSHOT_DIR + '/gpufrac-%d.png' % filename_id
         print 'Saving to', filename
         bitmap.SaveFile( filename, wx.BITMAP_TYPE_PNG )
 
     def update_pan_velocity( self ):
-        pan_velocity = afepy.Vector2Df( 0.0, 0.0 )
+        pan_velocity = gpufrac.Vector2Df( 0.0, 0.0 )
         if self.depressed_keys.get( 'D' ): pan_velocity.x += 1.0
         if self.depressed_keys.get( 'A' ): pan_velocity.x -= 1.0
         if self.depressed_keys.get( 'W' ): pan_velocity.y += 1.0
@@ -363,6 +339,7 @@ class AfeGlFrame( wx.Frame ):
         zoom_velocity = 0.0
         if self.depressed_keys.get( 'E' ): zoom_velocity += 1.0
         if self.depressed_keys.get( 'Q' ): zoom_velocity -= 1.0
+        # FIXME: Zooming in has somehow become broken...
         self.viewport.set_desired_zoom_velocity( zoom_velocity )
 
     def remember_window_size( self ):
@@ -371,8 +348,8 @@ class AfeGlFrame( wx.Frame ):
     def init_gl( self ):
         glClearColor( 0.0, 0.0, 0.0, 1.0 )
         self.set_viewport()
-        afepy.Shader.init()
-        self.generator_frame = JuliaShaderGenerator( self, self.xml_resource )
+        gpufrac.Shader.init()
+        self.generator_frame = FractalShaderGenerator( self, self.xml_resource )
 
     def set_viewport( self ):
         glViewport( 0, 0, self.width(), self.height() )
@@ -382,7 +359,7 @@ class AfeGlFrame( wx.Frame ):
         if hasattr( self, 'previous_window_size' ):
             xscale = float( self.width() ) / self.previous_window_size[0]
             yscale = float( self.height() ) / self.previous_window_size[1]
-            self.viewport.scale_extents( afepy.Vector2Df( xscale, yscale ) )
+            self.viewport.scale_extents( gpufrac.Vector2Df( xscale, yscale ) )
         self.remember_window_size()
 
 def exception_hook( type, value, traceback ):

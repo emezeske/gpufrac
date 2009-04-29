@@ -1,5 +1,5 @@
-#include "backend/utilities.h"
-#include "backend/viewport.h"
+#include "utilities.h"
+#include "viewport.h"
 
 Viewport::Viewport( const Vector2Df& _position, const Vector2Df& _size ) :
     desired_zoom_velocity_( 0.0f ),

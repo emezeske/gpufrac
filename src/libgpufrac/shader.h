@@ -6,8 +6,8 @@
 #include <string>
 #include <google/template.h>  
 
-#include "backend/utilities.h"
-#include "backend/geometry.h"
+#include "utilities.h"
+#include "geometry.h"
 
 struct Shader
 {

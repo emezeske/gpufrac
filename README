@@ -1,21 +1,21 @@
-This is the Advanced Fractal Explorer (AFE).
+This is gpufrac, a program that renders Julia and Mandelbrot set fractals using your GPU.
 
 ########################################################################################################
 # INSTALL
 ########################################################################################################
 
-To build AFE, make sure you have the stuff in DEPENDENCIES installed.  Then:
+To build gpufrac, make sure you have the stuff in DEPENDENCIES installed.  Then:
 
     $ scons
-    $ ./afe
+    $ ./src/gui/gpufrac-gui.py
 
-Note that at the moment, AFE has to be run from the top-level source directory.
+Note that at the moment, gpufrac has to be run from the top-level source directory.
 
 ########################################################################################################
 # HARDWARE
 ########################################################################################################
 
-AFE assumes that you have a pretty decent graphics card.  Also, installing the latest drivers for your
+gpufrac assumes that you have a pretty decent graphics card.  Also, installing the latest drivers for your
 graphics card is a very good idea.  There are known problems with older versions of the ATI drivers -- if
 you happen to be running Ubuntu Intrepid Ibex, you *will* have weird problems with the default driver version.
 

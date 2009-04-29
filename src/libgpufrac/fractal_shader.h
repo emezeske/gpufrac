@@ -1,9 +1,9 @@
 #ifndef JULIA_SHADER_H
 #define JULIA_SHADER_H
 
-#include "backend/geometry.h"
-#include "backend/utilities.h"
-#include "backend/generators/shader.h"
+#include "geometry.h"
+#include "utilities.h"
+#include "shader.h"
 
 typedef std::vector<char> ByteVector;
 
@@ -35,9 +35,9 @@ enum MultisamplingMode
     MS_8X
 };
 
-struct JuliaShader
+struct FractalShader
 {
-    JuliaShader();
+    FractalShader();
 
     void draw( const Vector2Di& screen_size, const Vector2Df& viewport_position, const Vector2Df& viewport_size );
 
