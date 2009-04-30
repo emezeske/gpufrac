@@ -11,8 +11,11 @@ struct Viewport
 
     void scale_extents( const Vector2Df& scale );
 
-    void set_desired_pan_velocity( const Vector2Df& desired_pan_velocity );
+    void zoom( const float factor, const Vector2Df& locus );
+    void pan( const Vector2Df& distance );
+
     void set_desired_zoom_velocity( const float desired_zoom_velocity );
+    void set_desired_pan_velocity( const Vector2Df& desired_pan_velocity );
 
     const Vector2Df& position() const { return position_; }
     const Vector2Df& size() const { return size_; }

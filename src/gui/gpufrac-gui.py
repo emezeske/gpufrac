@@ -155,7 +155,8 @@ class TrigPaletteSettings( object ):
                 self.sliders.append( TrigPaletteSlider( parent, color, setting, generator ) )
 
     def on_randomize( self, event ):
-        for slider in self.sliders: slider.randomize()
+        for slider in self.sliders:
+            slider.randomize()
 
 class PaletteSettings( object ):
     def __init__( self, parent, generator, prepare_gl ):
@@ -212,13 +213,9 @@ class FractalShaderGenerator( object ):
     def draw_fractal( self, width, height, viewport ):
         self.generator.draw( gpufrac.Vector2Di( width, height ), viewport.position(), viewport.size() )
 
-    def on_fractal_motion( self, event ):
-        if event.Dragging():
-            real = 2.0 * ( float( event.GetX() ) / self.fractal_frame.width() - 0.5 )
-            imag = 2.0 * ( float( self.fractal_frame.height() - event.GetY() ) / self.fractal_frame.height() - 0.5 )
-            self.general_settings.set_seed_text_ctrl( real, imag )
-            self.generator.set_seed( gpufrac.Vector2Df( real, imag ) )
-            event.Skip()
+    def set_seed( self, real, imag ):
+        self.general_settings.set_seed_text_ctrl( real, imag )
+        self.generator.set_seed( gpufrac.Vector2Df( real, imag ) )
        
 class FractalFrame( wx.Frame ):
     def __init__( self, pos, size ):
@@ -229,6 +226,8 @@ class FractalFrame( wx.Frame ):
         self.gl_initialized = False
         self.viewport = gpufrac.Viewport( gpufrac.Vector2Df( -1.0, -1.0 ), gpufrac.Vector2Df( 2.0, 2.0 ) )
         self.generator_frame = None
+        self.left_drag_begin = None
+        self.previous_window_size = None
         self.depressed_keys = {}
         self.last_timer_event = time.time()
         self.timer = wx.Timer( self )
@@ -255,7 +254,8 @@ class FractalFrame( wx.Frame ):
         self.last_timer_event = now
         self.handle_depressed_keys()
         self.viewport.do_one_step( step_time )
-        if self.generator_frame: self.generator_frame.do_one_step( step_time )
+        if self.generator_frame:
+            self.generator_frame.do_one_step( step_time )
         self.canvas.Refresh()
 
     def on_size( self, event ):
@@ -263,33 +263,52 @@ class FractalFrame( wx.Frame ):
         self.canvas.SetCurrent()
         self.set_viewport()
         self.canvas.Refresh( False )
-        event.Skip()
 
     def on_paint( self, event ):
         self.canvas.SetCurrent()
         if not self.gl_initialized:
             self.init_gl()
             self.gl_initialized = True
-        if self.generator_frame: self.generator_frame.draw_fractal( self.width(), self.height(), self.viewport )
+        if self.generator_frame:
+            self.generator_frame.draw_fractal( self.width(), self.height(), self.viewport )
         self.canvas.SwapBuffers()
-        event.Skip()
 
     def on_left_down( self, event ):
-        if self.generator_frame: self.generator_frame.on_fractal_motion( event )
+        self.left_drag_begin = ( event.GetX(), event.GetY() )
+        event.Skip()
 
     def on_motion( self, event ):
-        if self.generator_frame: self.generator_frame.on_fractal_motion( event )
+        if event.Dragging:
+            if event.LeftIsDown():
+                assert( self.left_drag_begin )
+                begin_real, begin_imag = self.screen_to_complex( self.left_drag_begin[0], self.left_drag_begin[1] )
+                end_real, end_imag = self.screen_to_complex( event.GetX(), event.GetY() )
+                self.viewport.pan( gpufrac.Vector2Df( begin_real - end_real, begin_imag - end_imag ) )
+                self.left_drag_begin = ( event.GetX(), event.GetY() )
+            if event.RightIsDown() and self.generator_frame:
+                real = 2.0 * ( float( event.GetX() ) / self.width() - 0.5 )
+                imag = 2.0 * ( float( self.height() - event.GetY() ) / self.height() - 0.5 )
+                self.generator_frame.set_seed( real, imag )
+                self.right_drag_begin = ( event.GetX(), event.GetY() )
+            event.Skip()
 
     def on_mousewheel( self, event ):
-        rotation = event.GetWheelRotation()
+        ZOOM_STEP = 0.05
+        rotation = float( event.GetWheelRotation() ) / event.GetWheelDelta()
+        zoom_factor = rotation * ZOOM_STEP
+        locus = self.screen_to_complex( event.GetX(), event.GetY() )
+        self.viewport.zoom( zoom_factor, gpufrac.Vector2Df( locus[0], locus[1] ) )
+        event.Skip()
 
     def on_key_down( self, event ):
         if event.GetKeyCode() == wx.WXK_ESCAPE:
             sys.exit( 0 )
         elif event.GetKeyCode() == wx.WXK_TAB:
             self.ShowFullScreen( not self.IsFullScreen() )
+            event.Skip()
         elif event.GetKeyCode() == wx.WXK_SPACE:
             self.take_screenshot()
+            event.Skip()
 
     def handle_depressed_keys( self ):
         # EVT_KEY_DOWN and EVT_KEY_UP cannot be used to detect keys that are intended to be held down, because
@@ -333,7 +352,7 @@ class FractalFrame( wx.Frame ):
         bitmap.SaveFile( filename, wx.BITMAP_TYPE_PNG )
 
     def remember_window_size( self ):
-        self.previous_window_size = (self.width(), self.height())
+        self.previous_window_size = ( self.width(), self.height() )
 
     def init_gl( self ):
         glClearColor( 0.0, 0.0, 0.0, 1.0 )
@@ -346,11 +365,16 @@ class FractalFrame( wx.Frame ):
         glMatrixMode( GL_PROJECTION )
         glLoadIdentity()
         glOrtho( 0, self.width(), 0, self.height(), 0, 1.0 )
-        if hasattr( self, 'previous_window_size' ):
+        if self.previous_window_size is not None:
             xscale = float( self.width() ) / self.previous_window_size[0]
             yscale = float( self.height() ) / self.previous_window_size[1]
             self.viewport.scale_extents( gpufrac.Vector2Df( xscale, yscale ) )
         self.remember_window_size()
+
+    def screen_to_complex( self, screen_x, screen_y ):
+        real = self.viewport.position().x + self.viewport.size().x * ( float( screen_x ) / self.width() )
+        imag = self.viewport.position().y + self.viewport.size().y * ( float( self.height() - screen_y ) / self.height() )
+        return real, imag
 
 def exception_hook( type, value, traceback ):
     sys.__excepthook__( type, value, traceback )
@@ -359,7 +383,7 @@ def exception_hook( type, value, traceback ):
 sys.excepthook = exception_hook
 
 app = wx.App()
-frame = FractalFrame( wx.DefaultPosition, (512, 512) )
+frame = FractalFrame( wx.DefaultPosition, ( 512, 512 ) )
 frame.Show()
 
 app.MainLoop()

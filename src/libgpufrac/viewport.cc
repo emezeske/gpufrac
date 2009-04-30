@@ -19,6 +19,23 @@ void Viewport::scale_extents( const Vector2Df& scale )
     size_ = new_size;
 }
 
+void Viewport::zoom( const float factor, const Vector2Df& locus )
+{
+    Vector2Df
+        locus_offset( locus - position_ ),
+        locus_ratio( locus_offset.x_ / size_.x_, locus_offset.y_ / size_.y_ ),
+        size_change = size_ * factor,
+        position_change( size_change.x_ * locus_ratio.x_, size_change.y_ * locus_ratio.y_ );
+
+    size_ -= size_change;
+    position_ += position_change;
+}
+
+void Viewport::pan( const Vector2Df& distance )
+{
+    position_ += distance;
+}
+
 void Viewport::set_desired_zoom_velocity( const float desired_zoom_velocity )
 {
     desired_zoom_velocity_ = desired_zoom_velocity;
