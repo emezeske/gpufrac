@@ -240,7 +240,6 @@ class FractalFrame( wx.Frame ):
         self.canvas.Bind( wx.EVT_MOTION, self.on_motion )
         self.canvas.Bind( wx.EVT_MOUSEWHEEL, self.on_mousewheel )
         self.canvas.Bind( wx.EVT_KEY_DOWN, self.on_key_down )
-        self.canvas.Bind( wx.EVT_KEY_UP, self.on_key_up )
         self.Show()
         self.canvas.SetFocus()
 
@@ -254,6 +253,7 @@ class FractalFrame( wx.Frame ):
         now = time.time()
         step_time = now - self.last_timer_event
         self.last_timer_event = now
+        self.handle_depressed_keys()
         self.viewport.do_one_step( step_time )
         if self.generator_frame: self.generator_frame.do_one_step( step_time )
         self.canvas.Refresh()
@@ -290,19 +290,21 @@ class FractalFrame( wx.Frame ):
             self.ShowFullScreen( not self.IsFullScreen() )
         elif event.GetKeyCode() == wx.WXK_SPACE:
             self.take_screenshot()
-        elif event.GetKeyCode() in range(0, 256):
-            char = chr( event.GetKeyCode() )
-            self.depressed_keys[char] = True
-            self.update_pan_velocity()
-            self.update_zoom_velocity()
 
-    def on_key_up( self, event ):
-        if event.GetKeyCode() in range(0, 256):
-            char = chr( event.GetKeyCode() )
-            if self.depressed_keys.get( char ):
-                self.depressed_keys[char] = False
-                self.update_pan_velocity()
-                self.update_zoom_velocity()
+    def handle_depressed_keys( self ):
+        # EVT_KEY_DOWN and EVT_KEY_UP cannot be used to detect keys that are intended to be held down, because
+        # the system's key repeat setting may result in them being called repeatedly while the key is depressed.
+        pan_velocity = gpufrac.Vector2Df( 0.0, 0.0 )
+        if wx.GetKeyState( ord( 'w' ) ): pan_velocity.y += 1.0
+        if wx.GetKeyState( ord( 's' ) ): pan_velocity.y -= 1.0
+        if wx.GetKeyState( ord( 'd' ) ): pan_velocity.x += 1.0
+        if wx.GetKeyState( ord( 'a' ) ): pan_velocity.x -= 1.0
+        self.viewport.set_desired_pan_velocity( pan_velocity )
+
+        zoom_velocity = 0.0
+        if wx.GetKeyState( ord( 'e' ) ): zoom_velocity += 1.0
+        if wx.GetKeyState( ord( 'q' ) ): zoom_velocity -= 1.0
+        self.viewport.set_desired_zoom_velocity( zoom_velocity )
 
     def take_screenshot( self ):
         context = wx.ClientDC( self )
@@ -329,23 +331,6 @@ class FractalFrame( wx.Frame ):
         filename = SCREENSHOT_DIR + '/gpufrac-%d.png' % filename_id
         print 'Saving to', filename
         bitmap.SaveFile( filename, wx.BITMAP_TYPE_PNG )
-
-    # FIXME: Hmm, ever since I upgraded to Kubuntu 9.04 (Jaunty Jackelope) the pan/zoom velocity stuff has
-    #        has been weirdly broken.  I think maybe it has something to do with key repeat...?
-
-    def update_pan_velocity( self ):
-        pan_velocity = gpufrac.Vector2Df( 0.0, 0.0 )
-        if self.depressed_keys.get( 'D' ): pan_velocity.x += 1.0
-        if self.depressed_keys.get( 'A' ): pan_velocity.x -= 1.0
-        if self.depressed_keys.get( 'W' ): pan_velocity.y += 1.0
-        if self.depressed_keys.get( 'S' ): pan_velocity.y -= 1.0
-        self.viewport.set_desired_pan_velocity( pan_velocity )
-
-    def update_zoom_velocity( self ):
-        zoom_velocity = 0.0
-        if self.depressed_keys.get( 'E' ): zoom_velocity += 1.0
-        if self.depressed_keys.get( 'Q' ): zoom_velocity -= 1.0
-        self.viewport.set_desired_zoom_velocity( zoom_velocity )
 
     def remember_window_size( self ):
         self.previous_window_size = (self.width(), self.height())
