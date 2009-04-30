@@ -1,10 +1,8 @@
-Uniform variables need to either be:
+OpenGL uniform variables need to either be:
     a) Not set when they aren't used in the shader program
     b) Always referenced in the shader program (drivers will otherwise optimize them out).
 
 Save videos to disk, maybe?
-
-Mousewheel zooming.
 
 Would be nice to build the C++ object files in an out-of-source directory.
 
@@ -13,3 +11,5 @@ Consider the possibility of rewriting the Shader, FractalShader, and Viewport cl
 Add a progressive drawing mode, so that when high quality settings are enabled the GUI is still usable.
 
 Add a slider for ambient lighting to the normal-mapping configuration.
+
+Add some controls to rotate the complex plane.

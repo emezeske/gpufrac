@@ -31,7 +31,8 @@ BOOST_PYTHON_MODULE(gpufrac)
     py::enum_<MultisamplingMode>( "MultisamplingMode" )
         .value( "MS_NONE", MS_NONE )
         .value( "MS_4X",   MS_4X )
-        .value( "MS_8X",   MS_8X );
+        .value( "MS_8X",   MS_8X )
+        .value( "MS_16X",  MS_16X );
 
     py::class_<FractalShader, boost::noncopyable>( "FractalShader" )
         .def( "draw",                           &FractalShader::draw ) 

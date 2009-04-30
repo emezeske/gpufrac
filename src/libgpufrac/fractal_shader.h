@@ -32,7 +32,8 @@ enum MultisamplingMode
 {
     MS_NONE,
     MS_4X,
-    MS_8X
+    MS_8X,
+    MS_16X
 };
 
 struct FractalShader

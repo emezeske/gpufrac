@@ -9,7 +9,7 @@ libgpufrac_headers = glob.glob( os.path.join( libgpufrac_source_dir, '*.h' ) )
 env = Environment()
 env['ENV'] = {'PATH':os.environ['PATH'], 'TERM':os.environ['TERM'], 'HOME':os.environ['HOME']} # Environment variables required by colorgcc.
 env['LIBPATH'] = [ './', '/usr/local/lib' ]
-env['CCFLAGS'] = [ '-g', '-Wall', '-W', '-Wshadow', '-Wpointer-arith', '-Wcast-qual', '-Wwrite-strings', '-Wconversion', '-Winline', '-Wredundant-decls', '-Wno-unused', '-Wno-deprecated', '-msse2', '-mfpmath=sse' ] # '-O3'
+env['CCFLAGS'] = [ '-g', '-Wall', '-W', '-Wshadow', '-Wpointer-arith', '-Wcast-qual', '-Wwrite-strings', '-Wconversion', '-Winline', '-Wredundant-decls', '-Wno-unused', '-Wno-deprecated' ]
 env['CPPPATH'] = [ './src' ]
 env['LIBS'] = [ 'GLEW', 'm', 'ctemplate', 'boost_python', 'boost_thread' ]
 env['SHLIBPREFIX'] = ""

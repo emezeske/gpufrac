@@ -25,7 +25,8 @@ const std::map<PaletteMode, cstring> palette_modes = boost::assign::map_list_of
 const std::map<MultisamplingMode, cstring> multisampling_modes = boost::assign::map_list_of
     ( MS_NONE, "MULTISAMPLING_NONE" )
     ( MS_4X,   "MULTISAMPLING_4X" )
-    ( MS_8X,   "MULTISAMPLING_8X" );
+    ( MS_8X,   "MULTISAMPLING_8X" )
+    ( MS_16X,  "MULTISAMPLING_16X" );
 
 template <typename enum_type>
 cstring map_lookup( const std::map<enum_type, cstring>& m, const enum_type e )

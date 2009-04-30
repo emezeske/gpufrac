@@ -23,7 +23,8 @@ ESCAPE_CONDITIONS = {
 MULTISAMPLING_MODES = {
     'None' : gpufrac.MultisamplingMode.MS_NONE,
     '4X'   : gpufrac.MultisamplingMode.MS_4X,
-    '8X'   : gpufrac.MultisamplingMode.MS_8X
+    '8X'   : gpufrac.MultisamplingMode.MS_8X,
+    '16X'  : gpufrac.MultisamplingMode.MS_16X
 }
 
 UPDATE_INTERVAL_MS = 10

@@ -54,9 +54,7 @@ escape_info calculate_escape_info( vec2 z )
     info.magnitude = 0.0;
     info.color = vec3( 0.0, 0.0, 0.0 );
 
-    float 
-        escape_magnitude = 0.0,
-        half_julia_exponent = julia_exponent / 2.0;
+    float half_julia_exponent = julia_exponent / 2.0;
 
     int iteration = 0;
 
@@ -177,7 +175,7 @@ vec3 get_color( vec2 z_a )
     vec3 normal = normalize( cross( point_b - point_a, point_c - point_a ) );
 
     // Multiply the color by the cosine of the angle between the face's normal and the light vector.
-    // TODO Make the light vector configurable.
+    // TODO Make the light vector configurable (and don't forget to normalize it).
     return base_color * dot( normal, vec3( 0.0, 0.0, 1.00 ) );
     // return base_color * dot( normal, normalize( vec3( 0.0, 0.20, 0.80 ) ) );
 }
@@ -186,10 +184,11 @@ vec3 get_color( vec2 z_a )
 vec3 get_color_multisample_4x( vec2 z_a )
 {
     // 4X rotated grid samples:
-    //  -  -  B  -
-    //  A  -  -  -
-    //  -  -  -  C
-    //  -  D  -  -
+    //
+    //  -  -  O  -
+    //  O  -  -  -
+    //  -  -  -  O
+    //  -  O  -  -
     
     float quarter_pixel = pixel_width / 4.0;
     
@@ -202,24 +201,64 @@ vec3 get_color_multisample_4x( vec2 z_a )
     return color / 4.0;
 }
 
+vec3 get_color_multisample_8x( vec2 z_a )
+{
+    // Double 4X rotated grid samples:
+    //
+    //  -  -  -  -  -  O  -  -   
+    //  -  -  -  -  -  -  O  -   
+    //  O  -  -  -  -  -  -  -   
+    //  -  O  -  -  -  -  -  -   
+    //  -  -  -  -  -  -  -  -   
+    //  -  -  -  -  -  -  -  O   
+    //  -  -  -  -  -  -  -  -  O
+    //  -  -  O  -  -  -  -  -   
+    //           O               
+
+    float eighth_pixel = pixel_width / 8.0;
+    vec2 z_b = vec2( z_a.x + eighth_pixel, z_a.y + eighth_pixel ); 
+    vec3 color = get_color_multisample_4x( z_a ) + get_color_multisample_4x( z_b );
+    return color / 2.0;
+}
+
+vec3 get_color_multisample_16x( vec2 z_a )
+{
+    // Quadruple 4X rotated grid samples:
+    //
+    //                    O
+    //  -  -  -  -  -  O  -  O   
+    //  -  O  -  -  -  -  O  -   
+    //  O  -  O  -  -  -  -  -   
+    //  -  O  -  -  -  -  -  -   
+    //  -  -  -  -  -  -  -  -  O
+    //  -  -  -  -  -  -  -  O     O
+    //  -  -  -  O  -  -  -  -  O
+    //  -  -  O  -  O  -  -  -   
+    //           O               
+
+    float eighth_pixel = pixel_width / 8.0;
+    vec2 z_b = vec2( z_a.x + eighth_pixel, z_a.y - eighth_pixel ); 
+    vec3 color = get_color_multisample_8x( z_a ) + get_color_multisample_8x( z_b );
+    return color / 2.0;
+}
+
 void main()
 {
     {{#MULTISAMPLING_NONE}}
-        vec3 pixel_color = get_color( gl_TexCoord[0].st );
+        vec3 color = get_color( gl_TexCoord[0].st );
     {{/MULTISAMPLING_NONE}}
 
     {{#MULTISAMPLING_4X}}
-        vec3 pixel_color = get_color_multisample_4x( gl_TexCoord[0].st );
+        vec3 color = get_color_multisample_4x( gl_TexCoord[0].st );
     {{/MULTISAMPLING_4X}}
 
     {{#MULTISAMPLING_8X}}
-        float eighth_pixel = pixel_width / 8.0;
-        vec2
-            z_a = gl_TexCoord[0].st,
-            z_b = vec2( z_a.x + eighth_pixel, z_a.y + eighth_pixel ); 
-        vec3 pixel_color = get_color_multisample_4x( z_a ) + get_color_multisample_4x( z_b );
-        pixel_color /= 2.0;
+        vec3 color = get_color_multisample_8x( gl_TexCoord[0].st );
     {{/MULTISAMPLING_8X}}
 
-    gl_FragColor = vec4( pixel_color, 1.0 );
+    {{#MULTISAMPLING_16X}}
+        vec3 color = get_color_multisample_16x( gl_TexCoord[0].st );
+    {{/MULTISAMPLING_16X}}
+
+    gl_FragColor = vec4( color, 1.0 );
 }

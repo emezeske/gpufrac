@@ -585,7 +585,7 @@
                                                 <property name="proportion">0</property>
                                                 <object class="wxChoice" expanded="1">
                                                     <property name="bg"></property>
-                                                    <property name="choices">&quot;None&quot; &quot;4X&quot; &quot;8X&quot;</property>
+                                                    <property name="choices">&quot;None&quot; &quot;4X&quot; &quot;8X&quot; &quot;16X&quot;</property>
                                                     <property name="context_help"></property>
                                                     <property name="enabled">1</property>
                                                     <property name="fg"></property>
