@@ -141,7 +141,7 @@ void FractalShader::set_orbit_trap_texture( const ByteVector& image_data, const 
 
 void FractalShader::load_shader_program()
 {
-    google::TemplateDictionary dictionary( "fractal" );
+    ctemplate::TemplateDictionary dictionary( "fractal" );
 
     dictionary.ShowSection( map_lookup( escape_conditions, escape_condition_ ) );
     dictionary.ShowSection( map_lookup( coloring_modes, coloring_mode_ ) );

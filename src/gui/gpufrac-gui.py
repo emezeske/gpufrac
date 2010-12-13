@@ -384,7 +384,7 @@ def exception_hook( type, value, traceback ):
 sys.excepthook = exception_hook
 
 app = wx.App()
-frame = FractalFrame( wx.DefaultPosition, ( 512, 512 ) )
+frame = FractalFrame( wx.DefaultPosition, ( 960, 854 ) )
 frame.Show()
 
 app.MainLoop()

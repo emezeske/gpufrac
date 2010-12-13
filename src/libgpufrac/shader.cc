@@ -98,9 +98,9 @@ void Shader::load_from_file( cstring& filename )
     else throw std::runtime_error( "Unable to open shader program file " + filename );
 }
 
-void Shader::load_from_template( cstring& filename, const google::TemplateDictionary& dictionary )
+void Shader::load_from_template( cstring& filename, const ctemplate::TemplateDictionary& dictionary )
 {
-    google::Template* glsl_template = google::Template::GetTemplate( filename.c_str(), google::DO_NOT_STRIP );
+    ctemplate::Template* glsl_template = ctemplate::Template::GetTemplate( filename.c_str(), ctemplate::DO_NOT_STRIP );
     mstring expanded_glsl;
     glsl_template->Expand( &expanded_glsl, &dictionary );
     load_program( expanded_glsl );

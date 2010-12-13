@@ -16,7 +16,7 @@ env['SHLIBPREFIX'] = ""
 
 # For people compiling boost themselves:
 #env['CPPPATH'] = [ './src', '/usr/local/include/boost-1_36' ]
-#env['LIBS'] = [ 'GLEW', 'm', 'ctemplate', 'boost_python-gcc41-mt', 'boost_thread-gcc41-mt' ]
+#env['LIBS'] = [ 'GLEW', 'm', 'ctemplate', 'boost_python', 'boost_thread' ]
 
 env.ParseConfig( 'python-config --includes' )
 env.ParseConfig( 'python-config --ldflags' )

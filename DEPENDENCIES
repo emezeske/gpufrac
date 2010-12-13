@@ -6,7 +6,7 @@ Library                        Versions Tested
 ----------------------------------------------
 Boost                          1.35, 1.37
 GLEW                           1.5
-google-ctemplate               0.93
+ctemplate                      0.98
 Python Imaging Library (PIL)   1.1.6
 wxPython                       2.8
 PyOpenGL                       3.0.0
@@ -36,5 +36,4 @@ python-opengl
 scons
 exuberant-ctags
 wxformbuilder
-
-google-ctemplate # No deb as of yet; download from http://code.google.com/p/google-ctemplate/
+libctemplate-dev

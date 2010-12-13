@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <string>
-#include <google/template.h>  
+#include <ctemplate/template.h>  
 
 #include "utilities.h"
 #include "geometry.h"
@@ -20,7 +20,7 @@ struct Shader
 
     void load_program( cstring& shader_program);
     void load_from_file( cstring& filename );
-    void load_from_template( cstring& filename, const google::TemplateDictionary& dictionary );
+    void load_from_template( cstring& filename, const ctemplate::TemplateDictionary& dictionary );
 
     void enable();
     void disable();
